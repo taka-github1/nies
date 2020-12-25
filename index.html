@@ -183,7 +183,7 @@ var tile_layers = [
   "Precipitation_RCP45_HadGem_R2081_2100",
   "Precipitation_RCP45_HadGem_RBASEYEAR",
   "Precipitation_RCP45_MIROC_R2031_2050",
-  "Precipitation_MIROC_RCP45_MIROC_R2081_2100",
+  "Precipitation_RCP45_MIROC_R2081_2100",
   "Precipitation_RCP45_MIROC_RBASEYEAR",
   "Precipitation_RCP45_MRI_R2031_2050",
   "Precipitation_RCP45_MRI_R2081_2100",
@@ -199,7 +199,7 @@ var tile_layers = [
   "Precipitation_RCP85_MIROC_RBASEYEAR",
   "Precipitation_RCP85_MRI_R2031_2050",
   "Precipitation_RCP85_MRI_R2081_2100",
-  "Precipitation_MRI_RCP85_MRI_RBASEYEAR"
+  "Precipitation_RCP85_MRI_RBASEYEAR"
 ]
 
 var map = null;
@@ -227,7 +227,7 @@ require([
   var info = new OAuthInfo({
     appId: "hkpA3zf1ofqdA37D",
     popup: false
-  }); 
+  });
 
   identityManager.registerOAuthInfos([info]);
   identityManager.getCredential(portalUrl);
