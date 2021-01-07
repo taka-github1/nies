@@ -461,15 +461,12 @@ require([
     
     var layer_id = "";
     var url = "";
-    var definitionExpression = '1=1';
     if (shihyo == "KUROROMAX") {
-      layer_id = "S8_Chlorophyll_3619"; 
+      layer_id = "S8_Chlorophyll_3619_9695"; 
       url = chlorophyll_layer_url;
-      definitionExpression = "SHURUI = \'MAX'"
     } else if (shihyo == "KUROROAVG"){
       layer_id = "S8_Chlorophyll_3619"; 
       url = chlorophyll_layer_url;
-      definitionExpression = "SHURUI = \'AVG'"
     } else if (shihyo == "BEACH"){
       layer_id = "S8_Beach_7205"; 
       url = beach_layer_url;
@@ -484,8 +481,7 @@ require([
     left_layer = new FeatureLayer({
       url: url,
       title: shihyo,
-      opacity: 0.5,
-      definitionExpression: definitionExpression
+      opacity: 0.5
     });
     
     current_field = field;
