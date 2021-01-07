@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ja" >
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>S8_viewer_all</title>
+  
+  
+  
+  
+<style>
+html,
+body{
+  height: 100%;
+},
+#headerDiv {
+  height: 40%;
+  display: flex;
+  flex-direction: column;
+}
+#viewDiv {
+  height: 60%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.switch-field {
+	display: flex;
+	margin-bottom: 10px;
+	overflow: hidden;
+}
+
+.switch-field input {
+	position: absolute !important;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	width: 1px;
+	border: 0;
+	overflow: hidden;
+}
+
+.switch-field label {
+	background-color: #e4e4e4;
+	color: rgba(0, 0, 0, 0.6);
+	font-size: 14px;
+	line-height: 1;
+	text-align: center;
+	padding: 5px 10px;
+	margin-right: -1px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+	transition: all 0.1s ease-in-out;
+}
+
+.switch-field label:hover {
+	cursor: pointer;
+}
+
+.switch-field input:checked + label {
+	background-color: #a5dc86;
+	box-shadow: none;
+}
+
+.switch-field label:first-of-type {
+	border-radius: 4px 0 0 4px;
+}
+
+.switch-field label:last-of-type {
+	border-radius: 0 4px 4px 0;
+}
+
+h2 {
+	font-size: 14px;
+	margin-bottom: 0px;
+}
+</style>
+
+  
+  
+  
+  
+
+</head>
+
+<body translate="no" >
+  <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+          name="viewport"
+          content="initial-scale=1,maximum-scale=1,user-scalable=no"
+          />
+    <title>S8</title>
+
+    <link
+          rel="stylesheet"
+          href="https://js.arcgis.com/4.18/esri/themes/light/main.css"
+          />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://js.arcgis.com/4.18/"></script>
+  </head>
+
+  <body>
+    <div id="headerDiv">
+      <h2>分野</h2>
+      <div class="switch-field">
+        <input type="radio" id="radio-KIKOU" name="switch-bunya" value="KIKOU" checked/>
+        <label for="radio-KIKOU">気候</label>
+        <input type="radio" id="radio-NOUGYOU" name="switch-bunya" value="NOUGYOU" />
+        <label for="radio-NOUGYOU">農業</label>
+        <input type="radio" id="radio-MIZUKANKYO" name="switch-bunya" value="MIZUKANKYO" />
+        <label for="radio-MIZUKANKYO">水環境</label>
+        <input type="radio" id="radio-SHIZENSEITAI" name="switch-bunya" value="SHIZENSEITAI" />
+        <label for="radio-SHIZENSEITAI">自然生態系</label>
+        <input type="radio" id="radio-SHIZENSAIGAI" name="switch-bunya" value="SHIZENSAIGAI" />
+        <label for="radio-SHIZENSAIGAI">自然災害</label>
+        <input type="radio" id="radio-KENKOU" name="switch-bunya" value="KENKOU" />
+        <label for="radio-KENKOU">健康</label>
+      </div>
+      <h2>気候・影響指標</h2>
+      <div id="KIKOU-SHIHYO" class="switch-field">
+        <input type="radio" id="radio-Temperature" name="switch-shihyo" value="Temperature" checked/>
+        <label for="radio-Temperature">年平均気温</label>
+        <input type="radio" id="radio-Precipitation" name="switch-shihyo" value="Precipitation" />
+        <label for="radio-Precipitation">年降水量</label>
+      </div>
+      <div id="NOUGYOU-SHIHYO" class="switch-field" style="display:none">
+        <input type="radio" id="radio-AgricultureRiceAdp0" name="switch-shihyo" value="AgricultureRiceAdp0" />
+        <label for="radio-AgricultureRiceAdp0">コメ収量（収量重視）</label>
+        <input type="radio" id="radio-AgricultureRiceLRAdp0" name="switch-shihyo" value="AgricultureRiceLRAdp0" />
+        <label for="radio-AgricultureRiceLRAdp0">コメ収量（品質重視）</label>
+      </div>
+      <div id="MIZUKANKYO-SHIHYO" class="switch-field" style="display:none">
+        <input type="radio" id="radio-KUROROMAX" name="switch-shihyo" value="KUROROMAX" />
+        <label for="radio-KUROROMAX">クロロフィルa濃度（年最高）</label>
+        <input type="radio" id="radio-KUROROAVG" name="switch-shihyo" value="KUROROAVG" />
+        <label for="radio-KUROROAVG">クロロフィルa濃度（年平均）</label>
+      </div>
+      <div id="SHIZENSEITAI-SHIHYO" class="switch-field" style="display:none">
+        <input type="radio" id="radio-ForestQacuta" name="switch-shihyo" value="ForestQacuta" />
+        <label for="radio-ForestQacuta">アカガシ</label>
+        <input type="radio" id="radio-ForestAVietchii" name="switch-shihyo" value="ForestAVietchii" />
+        <label for="radio-ForestAVietchii">シラビソ</label>
+        <input type="radio" id="radio-ForestPinusPumila" name="switch-shihyo" value="ForestPinusPumila" />
+        <label for="radio-ForestPinusPumila">ハイマツ</label>
+        <input type="radio" id="radio-ForestFagus" name="switch-shihyo" value="ForestFagus" />
+        <label for="radio-ForestFagus">ブナ</label>
+      </div>
+      <div id="SHIZENSAIGAI-SHIHYO" class="switch-field" style="display:none">
+        <input type="radio" id="radio-DisasterSFGCMc" name="switch-shihyo" value="DisasterSFGCMc" />
+        <label for="radio-DisasterSFGCMc">斜面崩壊発生確率</label>
+        <input type="radio" id="radio-BEACH" name="switch-shihyo" value="BEACH" />
+        <label for="radio-BEACH">砂浜消失率</label>
+      </div>
+      <div id="KENKOU-SHIHYO" class="switch-field" style="display:none">
+        <input type="radio" id="radio-HealthEAAD" name="switch-shihyo" value="HealthEAAD" />
+        <label for="radio-HealthEAAD">ヒトスジシマカ</label>
+        <input type="radio" id="radio-HEAT_DISORDER" name="switch-shihyo" value="HEAT_DISORDER" />
+        <label for="radio-HEAT_DISORDER">熱中症搬送者数</label>
+        <input type="radio" id="radio-HEAT_STRESS" name="switch-shihyo" value="HEAT_STRESS" hidden/>
+        <label for="radio-HEAT_STRESS">熱ストレス超過死亡者数</label>
+      </div>
+      <h2>気候モデル</h2>
+      <div class="switch-field">
+        <input type="radio" id="radio-MIROC" name="switch-model" value="MIROC" checked/>
+        <label for="radio-MIROC">MIROC5</label>
+        <input type="radio" id="radio-MRI" name="switch-model" value="MRI" />
+        <label for="radio-MRI">MRI-CGCM3.0</label>
+        <input type="radio" id="radio-GFDL" name="switch-model" value="GFDL" />
+        <label for="radio-GFDL">GFDL CM3</label>
+        <input type="radio" id="radio-HadGem" name="switch-model" value="HadGEM" />
+        <label for="radio-HadGem">HadGEM2-ES</label>
+      </div>
+      <h2>排出シナリオ</h2>
+      <div class="switch-field">
+        <input type="radio" id="radio-RCP26" name="switch-rcp" value="RCP26" checked/>
+        <label for="radio-RCP26">RCP 2.6</label>
+        <input type="radio" id="radio-RCP45" name="switch-rcp" value="RCP45" />
+        <label for="radio-RCP45">RCP 4.5</label>
+        <input type="radio" id="radio-RCP85" name="switch-rcp" value="RCP85"/>
+        <label for="radio-RCP85">RCP 8.5</label>
+      </div>
+      <h2>対象期間</h2>
+      <div id="KIKAN-BASE" class="switch-field">
+        <input type="radio" id="radio-RBASEYEAR" name="switch-kikan" value="RBASEYEAR" checked/>
+        <label for="radio-RBASEYEAR">現在</label>
+        <input type="radio" id="radio-R2031_2050" name="switch-kikan" value="R2031_2050" />
+        <label for="radio-R2031_2050">21世紀半ば</label>
+        <input type="radio" id="radio-R2081_2100" name="switch-kikan" value="R2081_2100" />
+        <label for="radio-R2081_2100">21世紀末</label>
+      </div>
+      <div id="KIKAN-DIFF" class="switch-field">
+        <input type="radio" id="radio-R3150" name="switch-kikan" value="R3150" />
+        <label for="radio-R3150">比較（21世紀半ば）</label>
+        <input type="radio" id="radio-R8100" name="switch-kikan" value="R8100" />
+        <label for="radio-R8100">比較（21世紀末）</label>
+      </div>
+    </div>
+    <div id="viewDiv"></div>
+  </body>
+</html>
+  
+  
+      <script id="rendered-js" >
+var tile_base_url = "https://tiles.arcgis.com/tiles/wlu6GWBNU4aPwEwv/arcgis/rest/services/";
+
+var chlorophyll_layer_url = "https://services9.arcgis.com/wlu6GWBNU4aPwEwv/arcgis/rest/services/S8_Chlorophyll/FeatureServer/0";
+var beach_layer_url = "https://services9.arcgis.com/wlu6GWBNU4aPwEwv/arcgis/rest/services/S8_Beach/FeatureServer/0";
+var heat_stress_layer_url = "https://services9.arcgis.com/wlu6GWBNU4aPwEwv/arcgis/rest/services/S8_Heat_Stress/FeatureServer/0";
+var heat_disorder_layer_url = "https://services9.arcgis.com/wlu6GWBNU4aPwEwv/arcgis/rest/services/S8_Heat_Disorder/FeatureServer/0";
+
+var renderer_webmap = "845743cc8fa749b089874a8bc441b7df";
+
+var map = null;
+var view = null;
+var legend = null;
+var current_field = null;
+
+require([
+  "esri/Map",
+  "esri/WebMap",
+  "esri/views/MapView",
+  "esri/layers/TileLayer",
+  "esri/layers/FeatureLayer",
+  "esri/widgets/Home",
+  "esri/widgets/Swipe",
+  "esri/widgets/Legend",
+  "esri/widgets/Expand",
+  "esri/widgets/BasemapGallery",
+  "esri/geometry/Extent",
+  "esri/renderers/Renderer"
+], function (Map, WebMap, MapView, TileLayer, FeatureLayer, Home, Swipe, Legend, Expand, BasemapGallery, Extent, Renderer) {
+  map = new Map({
+    basemap: "satellite"
+  });
+
+  view = new MapView({
+    container: "viewDiv",
+    map: map,
+    zoom: 14
+  });
+
+  var homeBtn = new Home({
+    view: view
+  });
+  view.ui.add(homeBtn, "top-left");
+
+  var basemapGallery = new BasemapGallery({
+    view: view,
+    container: document.createElement("div")
+  });
+
+  var bgExpand = new Expand({
+    view: view,
+    content: basemapGallery
+  });
+
+  basemapGallery.watch("activeBasemap", function () {
+    var mobileSize =
+        view.heightBreakpoint === "xsmall" ||
+        view.widthBreakpoint === "xsmall";
+
+    if (mobileSize) {
+      bgExpand.collapse();
+    }
+  });
+  view.ui.add(bgExpand, "top-right");
+
+  setLayer();
+
+  var ext = new Extent({
+    xmin: 126.2331,
+    ymin: 31.367,
+    xmax: 151.5675,
+    ymax: 44.3821
+  });
+  view.extent = ext;
+
+
+  $('input[name="switch-bunya"]').change(function() {
+    setForm();
+    setLayer();
+  })
+
+  $('input[name="switch-shihyo"]').change(function() {
+    //setForm();
+    setLayer();
+  })
+
+  $('input[name="switch-rcp"]').change(function() {
+    setLayer();
+  })
+
+  $('input[name="switch-model"]').change(function() {
+    setLayer();
+  })
+
+  $('input[name="switch-kikan"]').change(function() {
+    setLayer();
+  })
+
+
+  function setLayer() {
+
+    map.removeAll();
+    view.ui.remove(legend);
+
+    var bunya = $('input[name=switch-bunya]:checked').val();
+    var shihyo = $('input[name=switch-shihyo]:checked').val();
+    var model = $('input[name=switch-model]:checked').val();
+    var rcp = $('input[name=switch-rcp]:checked').val();
+    var kikan = $('input[name=switch-kikan]:checked').val();
+
+    var left_layer_url = "";
+    
+    var layers = [];
+
+    if (kikan == "R3150" || kikan == "R8100") {
+      if (shihyo == "Temperature") {
+        kikan = kikan + "_DIFF";
+      }
+      if (shihyo == "Precipitation") {
+        kikan = kikan + "_RATE";
+      }
+      if (bunya == "NOUGYOU") {
+        kikan = kikan + "_RATE";
+      }
+    }
+
+    var left_layer = null;
+
+    if (shihyo == "KUROROMAX" || shihyo == "KUROROAVG" || shihyo == "BEACH" || shihyo == "HEAT_DISORDER" || shihyo == "HEAT_STRESS") {
+      var select_field = rcp + "_" + model + "_" + kikan;
+      create_renderer(shihyo, select_field); 
+    } else {
+      var select_layer = shihyo + "_" + rcp + "_" + model + "_" + kikan;
+      left_layer_url = tile_base_url + select_layer + "/MapServer";
+
+      left_layer = new TileLayer({
+        url: left_layer_url,
+        title: shihyo
+      });
+      left_layer.effect = "opacity(100%)";
+      
+      map.add(left_layer);
+    }
+
+    legend = new Legend({
+      view: view,
+      layerInfos: [
+        {
+          layer: left_layer,
+          title: shihyo
+        }
+      ]
+    });
+
+    view.ui.add(legend, "bottom-left");
+  }
+
+  function setForm(){
+    var bunya = $('input[name=switch-bunya]:checked').val();
+
+    if (bunya == 'KIKOU'){
+      $('#KIKOU-SHIHYO').css('display', 'flex');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      $('input:radio[name="switch-shihyo"]').val(["Temperature"]);
+    } else if (bunya == 'NOUGYOU'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'flex');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      $('input:radio[name="switch-shihyo"]').val(["AgricultureRiceAdp0"]);
+    } else if (bunya == 'MIZUKANKYO'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'flex');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      $('input:radio[name="switch-shihyo"]').val(["KUROROMAX"]);
+    } else if (bunya == 'SHIZENSEITAI'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'flex');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      $('input:radio[name="switch-shihyo"]').val(["ForestQacuta"]);
+    } else if (bunya == 'SHIZENSAIGAI'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'flex');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      $('input:radio[name="switch-shihyo"]').val(["DisasterSFGCMc"]);
+    } else if (bunya == 'KENKOU'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'flex');
+      $('input:radio[name="switch-shihyo"]').val(["HealthEAAD"]);
+    }
+
+    var shihyo = $('input[name=switch-shihyo]:checked').val();
+
+    if (shihyo == 'Temperature' || shihyo == 'Precipitation'){
+      $('#KIKAN-BASE').css('display', 'flex');
+      $('#KIKAN-DIFF').css('display', 'flex');
+      $('input:radio[name="switch-kikan"]').val(["RBASEYEAR"]);
+    } else if (bunya == 'NOUGYOU'){
+      $('#KIKAN-BASE').css('display', 'none');
+      $('#KIKAN-DIFF').css('display', 'flex');
+      $('input:radio[name="switch-kikan"]').val(["R3150"]);
+    } else if (bunya == 'SHIZENSEITAI'){
+      $('#KIKAN-BASE').css('display', 'flex');
+      $('#KIKAN-DIFF').css('display', 'none');
+      $('input:radio[name="switch-kikan"]').val(["RBASEYEAR"]);
+    } else if (shihyo == 'DisasterSFGCMc' || shihyo == 'HealthEAAD'){
+      $('#KIKAN-BASE').css('display', 'flex');
+      $('#KIKAN-DIFF').css('display', 'none');
+      $('input:radio[name="switch-kikan"]').val(["RBASEYEAR"]);
+    } else{
+      $('#KIKAN-BASE').css('display', 'flex');
+      $('#KIKAN-DIFF').css('display', 'flex');
+      $('input:radio[name="switch-kikan"]').val(["RBASEYEAR"]);
+    }
+  }
+
+  function create_renderer(shihyo, field) {
+
+    const webmap = new WebMap({
+      portalItem: {
+        id: renderer_webmap
+      }
+    });
+    
+    var layer_id = "";
+    var url = "";
+    var definitionExpression = '1=1';
+    if (shihyo == "KUROROMAX") {
+      layer_id = "S8_Chlorophyll_3619"; 
+      url = chlorophyll_layer_url;
+      definitionExpression = "SHURUI = \'MAX'"
+    } else if (shihyo == "KUROROAVG"){
+      layer_id = "S8_Chlorophyll_3619"; 
+      url = chlorophyll_layer_url;
+      definitionExpression = "SHURUI = \'AVG'"
+    } else if (shihyo == "BEACH"){
+      layer_id = "S8_Beach_7205"; 
+      url = beach_layer_url;
+    } else if (shihyo == "HEAT_DISORDER") {
+      layer_id = "S8_Heat_Disorder_2663"; 
+      url = heat_disorder_layer_url;
+    } else if (shihyo == "HEAT_STRESS") {
+      layer_id = "S8_Heat_Stress_594"; 
+      url = heat_stress_layer_url;
+    }
+    
+    left_layer = new FeatureLayer({
+      url: url,
+      title: shihyo,
+      definitionExpression: definitionExpression
+    });
+    
+    current_field = field;
+
+    webmap.load()
+      .then(function(value) {
+      const layer = value.findLayerById(layer_id);
+      var renderer = layer.renderer;
+      renderer.field = current_field;
+      
+      left_layer.renderer = renderer;
+      
+      map.add(left_layer);
+    });
+    
+  }
+});
+    </script>
+
+  
+
+</body>
+
+</html>
+ 
