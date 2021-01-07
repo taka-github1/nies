@@ -358,19 +358,19 @@ require([
       left_layer.effect = "opacity(100%)";
       
       map.add(left_layer);
+	    
+      legend = new Legend({
+        view: view,
+        layerInfos: [
+          {
+            layer: left_layer,
+            title: shihyo
+          }
+        ]
+      });
+      
+      view.ui.add(legend, "bottom-left");
     }
-
-    legend = new Legend({
-      view: view,
-      layerInfos: [
-        {
-          layer: left_layer,
-          title: shihyo
-        }
-      ]
-    });
-
-    view.ui.add(legend, "bottom-left");
   }
 
   function setForm(){
@@ -498,6 +498,17 @@ require([
       left_layer.renderer = renderer;
       
       map.add(left_layer);
+	    
+      legend = new Legend({
+        view: view,
+        layerInfos: [
+          {
+            layer: left_layer,
+            title: shihyo
+          }
+        ]
+      });
+      view.ui.add(legend, "bottom-left");
     });
     
   }
