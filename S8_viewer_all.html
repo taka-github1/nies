@@ -488,6 +488,8 @@ require([
 
     webmap.load()
       .then(function(value) {
+      view.ui.remove(legend);
+
       const layer = value.findLayerById(layer_id);
       var renderer = layer.renderer;
       renderer.field = current_field;
