@@ -219,6 +219,9 @@ var legend = null;
 var current_field = null;
 
 require([
+  "esri/portal/Portal",
+  "esri/identity/OAuthInfo",
+  "esri/identity/IdentityManager",
   "esri/Map",
   "esri/WebMap",
   "esri/views/MapView",
@@ -231,7 +234,17 @@ require([
   "esri/widgets/BasemapGallery",
   "esri/geometry/Extent",
   "esri/renderers/Renderer"
-], function (Map, WebMap, MapView, TileLayer, FeatureLayer, Home, Swipe, Legend, Expand, BasemapGallery, Extent, Renderer) {
+], function (Portal, OAuthInfo, identityManager, Map, WebMap, MapView, TileLayer, FeatureLayer, Home, Swipe, Legend, Expand, BasemapGallery, Extent, Renderer) {
+  var portalUrl =  "https://nies.maps.arcgis.com";
+
+  var info = new OAuthInfo({
+    appId: "dk9ozouchIpZXrqT",
+    popup: false
+  });
+
+  identityManager.registerOAuthInfos([info]);
+  identityManager.getCredential(portalUrl);
+  
   map = new Map({
     basemap: "satellite"
   });
