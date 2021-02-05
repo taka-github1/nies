@@ -1,0 +1,513 @@
+
+
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+
+  <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+<meta name="apple-mobile-web-app-title" content="CodePen">
+
+<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+<link rel="mask-icon" type="" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+
+
+  <title>CodePen - アメダス_v01</title>
+  
+  
+  
+  
+<style>
+html,
+body{
+  height: 100%;
+
+}
+
+#mainDiv {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+#headerDiv {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+}
+
+#viewDiv {
+  width: 70%;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+h2 {
+	font-size: 14px;
+	margin-bottom: 0px;
+}
+
+.dropdown {
+  position: relative;
+  display:block;
+  font-size: 16px;
+  margin-bottom: 12px;
+  padding:0;
+}
+
+#yearselector{
+  width: 90%;
+  height: 70px;
+}
+</style>
+
+  
+  
+  
+  
+
+</head>
+
+<body translate="no" >
+  <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+          name="viewport"
+          content="initial-scale=1,maximum-scale=1,user-scalable=no"
+          />
+    <title>S8</title>
+
+    <link
+          rel="stylesheet"
+          href="https://js.arcgis.com/4.18/esri/themes/light/main.css"
+          />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://js.arcgis.com/4.18/"></script>
+  </head>
+
+  <body>
+    <div id="mainDiv">
+      <div id="headerDiv">
+        <h2>指標（年別）</h2>
+        <div class="button dropdown"> 
+          <select id="bunruiselector">
+            <option value="年間値">年間値</option>
+            <!--<option value="月別値">月別値</option>-->
+          </select>
+        </div>
+        <div class="button dropdown"> 
+          <select id="shihyoselector">
+            <option value="年平均気温">年平均気温(℃)</option>
+            <option value="日最高気温の年平均">日最高気温の年平均(℃)</option>
+            <option value="日最低気温の年平均">日最低気温の年平均(℃)</option>
+            <option value="猛暑日の年間日数">猛暑日（日最高気温35℃以上）の年間日数(日)</option>
+            <option value="真夏日の年間日数">真夏日（日最高気温30℃以上）の年間日数(日)</option>
+            <option value="夏日の年間日数">夏日（日最高気温25℃以上）の年間日数(日)</option>
+            <option value="熱帯夜の年間日数">熱帯夜（日最低気温25℃以上）の年間日数(日)</option>
+            <option value="冬日の年間日数">冬日（日最低気温0℃以下）の年間日数(日)</option>
+            <option value="真冬日の年間日数">真冬日（日最高気温0℃以下）の年間日数(日)</option>
+            <option value="年降水量">年降水量(mm)</option>
+            <option value="日降水量の年最大値">日降水量の年最大値(mm)</option>
+            <option value="日降水量100mm以上の年間日数">日降水量100mm以上の年間日数(日)</option>
+            <option value="日降水量200mm以上の年間日数">日降水量200mm以上の年間日数(日)</option>
+            <option value="1時間降水量30mm以上の年間発生回数">1時間降水量30mm以上の年間発生回数(回)</option>
+            <option value="1時間降水量50mm以上の年間発生回数">1時間降水量50mm以上の年間発生回数(回)</option>
+            <option value="無降水日年間日数">無降水日年間日数(日)</option>
+            <option value="年最大積雪深">年最大積雪深(cm)</option>
+            <option value="日降雪量の年最大値">日降雪量の年最大値(cm)</option>
+          </select>
+        </div>
+        <h2>対象年</h2>
+        <div id="yearselector" class="slider"></div>
+        <h2>観測所選択</h2>
+        <div class="button dropdown"> 
+          <select id="prefectureselector">
+            <option value="全国">全国</option>
+          </select>
+          <select id="observatoryselector">
+            <option value="全て">全て</option>
+          </select>
+        </div>
+      </div>
+      <div id="viewDiv"></div>
+    </div>
+  </body>
+</html>
+  
+  
+      <script id="rendered-js" >
+var tile_base_url = "https://tiles.arcgis.com/tiles/YweFsHK2qzfki4O5/arcgis/rest/services/";
+
+var amedas_year_data_url = "https://services6.arcgis.com/YweFsHK2qzfki4O5/arcgis/rest/services/amedas_year_data/FeatureServer/0"
+
+var amedas_month_data_url = "https://services6.arcgis.com/YweFsHK2qzfki4O5/arcgis/rest/services/amedas_yearmonth_data/FeatureServer/0"
+
+var renderer_webmap = "86dd55c56c3147ca8133450f71aa0d38";
+
+var map = null;
+var view = null;
+var legend = null;
+var current_field = null;
+var left_layer = null;
+var graphicsLayer = null;
+
+var default_extend = {
+  xmin: 126.2331,
+  ymin: 31.367,
+  xmax: 151.5675,
+  ymax: 44.3821
+}
+
+require([
+  "esri/Map",
+  "esri/WebMap",
+  "esri/views/MapView",
+  "esri/layers/TileLayer",
+  "esri/layers/FeatureLayer",
+  "esri/layers/GraphicsLayer",
+  "esri/widgets/Home",
+  "esri/widgets/Swipe",
+  "esri/widgets/Legend",
+  "esri/widgets/Expand",
+  "esri/widgets/BasemapGallery",
+  "esri/widgets/Slider",
+  "esri/geometry/Extent",
+  "esri/renderers/Renderer"
+], function (Map, WebMap, MapView, TileLayer, FeatureLayer, GraphicsLayer, 
+              Home, Swipe, Legend, Expand, BasemapGallery, Slider, Extent, Renderer) {
+  map = new WebMap({
+    portalItem: {
+      id: "f2e62fc62b3d4bedb874d25cf443c776"
+    }
+  });
+
+  view = new MapView({
+    container: "viewDiv",
+    map: map,
+    zoom: 14,
+    constraints: {
+      minScale : 30000000,
+      maxScale : 5000
+    }
+  });
+
+  const prefectures = new FeatureLayer({
+    portalItem: {
+      id: "bf1517e6867c416d817a46d0b444dc5f"
+    }
+  });
+
+  var shihyoLayer = null;
+
+
+  prefecture_tileLayer = new TileLayer({
+    url: "https://tiles.arcgis.com/tiles/YweFsHK2qzfki4O5/arcgis/rest/services/Temperature_RCP26_Miroc_RBASEYEAR/MapServer",
+    title: "prefecture_tile"
+  });
+
+  var homeBtn = new Home({
+    view: view
+  });
+  view.ui.add(homeBtn, "top-left");
+
+  var basemapGallery = new BasemapGallery({
+    view: view,
+    container: document.createElement("div")
+  });
+
+  var bgExpand = new Expand({
+    view: view,
+    content: basemapGallery
+  });
+
+  basemapGallery.watch("activeBasemap", function () {
+    var mobileSize =
+        view.heightBreakpoint === "xsmall" ||
+        view.widthBreakpoint === "xsmall";
+
+    if (mobileSize) {
+      bgExpand.collapse();
+    }
+  });
+  view.ui.add(bgExpand, "top-right");
+
+  var legend = new Legend({
+    view: view
+  });
+
+  var lgExpand = new Expand({
+    view: view,
+    content: legend,
+    expanded: true
+  });
+
+  view.ui.add(lgExpand, "bottom-right");
+
+  var yearSlider = new Slider({
+    container: "yearselector",
+    min: 1938,
+    max: 2020,
+    steps: 1,
+    labelFormatFunction: function(value, type){
+      return value + "年";
+    },
+    values: [ 2019 ],
+    visibleElements: {
+      labels: true,
+      rangeLabels: true
+    }
+  });
+
+  view.when(function() {
+    setLayer();
+  });
+
+
+  view.extent = default_extend;
+
+  setForm(false);
+
+
+  $('#bunruiselector').change(function() {
+    setForm();
+    setLayer();
+  })
+
+  $('#shihyoselector').change(function() {
+    setLayer();
+    zoomLayer();
+  })
+
+  $('#monthshihyoselector').change(function() {
+    setLayer();
+    zoomLayer();
+  })
+
+  $('#prefectureselector').change(function() {
+    setObservatoryselector();
+    setLayer();
+    zoomLayer();
+  })
+  
+  $('#observatoryselector').change(function() {
+    zoomLayer();
+  })
+
+  yearSlider.on("thumb-drag", function(event) {
+    selectYearData();
+  });
+
+  function setLayer() {
+
+    var shihyo = $('#shihyoselector').val();
+    var year = yearSlider.values[0];
+    var area = $('#prefectureselector').val();
+
+    var layers = map.allLayers.items;
+    for(let i = 0; i < layers.length; i++) {
+      if (layers[i].type != "feature") {
+        continue;
+      }
+
+      if (layers[i].title == shihyo) {
+        shihyoLayer = layers[i];
+        legend.layerInfos.layer = shihyoLayer;
+        selectYearData();
+
+        layers[i].visible = true;
+      } else {
+        layers[i].visible = false;
+      }
+    }
+
+    selectYearData();
+
+  }
+
+  function selectYearData() {
+    var year = yearSlider.values[0];
+    shihyoLayer.definitionExpression =  "年 = " + String(year);
+
+    view.whenLayerView(shihyoLayer).then(function (featureLayerView) {
+      featureLayerView.filter = {
+        where: "年 = " + String(year)
+      };
+    });
+
+  }
+
+  function setForm(){
+    var bunrui = $('#bunruiselector').val();
+    var shihyo = $('#shihyoselector').val();
+
+
+    $('#shihyoselector > option').remove();
+
+    if (bunrui == "年間値") {
+      $('#shihyoselector').append($('<option>').html("年平均気温(℃)").val("年平均気温"));
+      $('#shihyoselector').append($('<option>').html("日最高気温の年平均(℃)").val("日最高気温の年平均"));
+      $('#shihyoselector').append($('<option>').html("日最低気温の年平均(℃)").val("日最低気温の年平均"));
+      $('#shihyoselector').append($('<option>').html("猛暑日（日最高気温35℃以上）の年間日数(日)").val("猛暑日の年間日数"));
+      $('#shihyoselector').append($('<option>').html("真夏日（日最高気温30℃以上）の年間日数(日)").val("真夏日の年間日数"));
+      $('#shihyoselector').append($('<option>').html("夏日（日最高気温25℃以上）の年間日数(日)").val("夏日の年間日数"));
+      $('#shihyoselector').append($('<option>').html("熱帯夜（日最低気温25℃以上）の年間日数(日)").val("熱帯夜の年間日数"));
+      $('#shihyoselector').append($('<option>').html("冬日（日最低気温0℃以下）の年間日数(日)").val("冬日の年間日数"));
+      $('#shihyoselector').append($('<option>').html("真冬日（日最高気温0℃以下）の年間日数(日)").val("真冬日の年間日数"));
+      $('#shihyoselector').append($('<option>').html("年降水量(mm)").val("年降水量"));
+      $('#shihyoselector').append($('<option>').html("日降水量の年最大値(mm)").val("日降水量の年最大値"));
+      $('#shihyoselector').append($('<option>').html("日降水量100mm以上の年間日数(日)").val("日降水量100mm以上の年間日数"));
+      $('#shihyoselector').append($('<option>').html("日降水量200mm以上の年間日数(日)").val("日降水量200mm以上の年間日数"));
+      $('#shihyoselector').append($('<option>').html("1時間降水量30mm以上の年間発生回数(回)").val("1時間降水量30mm以上の年間発生回数"));
+      $('#shihyoselector').append($('<option>').html("1時間降水量50mm以上の年間発生回数(回)").val("1時間降水量50mm以上の年間発生回数"));
+      $('#shihyoselector').append($('<option>').html("無降水日年間日数(日)").val("無降水日年間日数"));
+      $('#shihyoselector').append($('<option>').html("年最大積雪深(cm)").val("年最大積雪深"));
+      $('#shihyoselector').append($('<option>').html("日降雪量の年最大値(cm)").val("日降雪量の年最大値"));
+      $('#shihyoselector').prop("selectedIndex", 0);
+    } else {
+      $('#shihyoselector').append($('<option>').html("月平均気温(℃)").val("月平均気温"));
+      $('#shihyoselector').append($('<option>').html("日最高気温の月平均(℃)").val("日最高気温の月平均"));
+      $('#shihyoselector').append($('<option>').html("日最低気温の月平均(℃)").val("日最低気温の月平均"));
+      $('#shihyoselector').append($('<option>').html("月降水量(mm)").val("月降水量"));
+      $('#shihyoselector').append($('<option>').html("月最大積雪深(cm)").val("月最大積雪深"));
+    }
+    $('#shihyoselector').prop("selectedIndex", 0);
+
+    var table = new FeatureLayer({
+      url: amedas_year_data_url
+    }); 
+    var query = table.createQuery();
+
+    query.where = "1=1";
+    query.outFields = [
+      "都道府県"
+    ];
+    query.orderByFields = "地点番号";
+    query.groupByFieldsForStatistics = "都道府県";
+
+    query.outStatistics = [
+      {
+        statisticType: "min",
+        onStatisticField: "都道府県",
+        outStatisticFieldName: "都道府県リスト"
+      },
+      {
+        statisticType: "min",
+        onStatisticField: "地点番号",
+        outStatisticFieldName: "地点番号"
+      }  
+    ];
+    query.returnGeometry = false;
+
+    table.queryFeatures(query)
+      .then(function(response){
+      var features = response.features;
+      var recordes = [];
+      $('#prefectureselector > option').remove();
+      $('#prefectureselector').append($('<option>').html("全国").val("全国"));
+
+      for(var i = 0; i< features.length; i++) {
+        var area = features[i].attributes["都道府県リスト"];
+        $('#prefectureselector').append($('<option>').html(area).val(area));
+
+      }
+      $('#prefectureselector').prop("selectedIndex", 0);
+
+      setObservatoryselector();
+    });
+  }
+
+  function setObservatoryselector() {
+
+    var prefecture = $('#prefectureselector').val();
+
+    var query = shihyoLayer.createQuery();
+
+    if (prefecture == "全国") {
+      query.where = "1=1";
+    } else {
+      query.where = "都道府県= '" + prefecture + "'";
+    }
+
+    query.outFields = [
+      "都道府県", "地点番号", "観測地点名"
+    ];
+    query.orderByFields = "地点番号";
+    query.groupByFieldsForStatistics = ["地点番号", "観測地点名"];
+
+    query.outStatistics = [
+      {
+        statisticType: "min",
+        onStatisticField: "都道府県",
+        outStatisticFieldName: "都道府県リスト"
+      },
+      {
+        statisticType: "min",
+        onStatisticField: "観測地点名",
+        outStatisticFieldName: "観測地点名リスト"
+      }  
+    ];
+    query.returnGeometry = false;
+
+    $('#observatoryselector > option').remove();
+    $('#observatoryselector').append($('<option>').html("全て").val("全て"));
+    $('#observatoryselector').prop("selectedIndex", 0);
+    
+    shihyoLayer.queryFeatures(query)
+      .then(function(response){
+      var features = response.features;
+      var recordes = [];
+      
+
+      for(var i = 0; i< features.length; i++) {
+        var area = features[i].attributes["観測地点名リスト"];
+        $('#observatoryselector').append($('<option>').html(area).val(area));
+
+      }
+      
+
+
+    });
+  }
+
+  async function zoomLayer() {
+
+    var prefecture = $('#prefectureselector').val();
+    var observatory =  $('#observatoryselector').val();
+    shihyoLayer.definitionExpression = "";
+
+    if (observatory != "全て"){
+      shihyoLayer.definitionExpression = "観測地点名 = '" + observatory + "'";
+      zoomToLayer();
+    } else if (prefecture != "全国") {
+      shihyoLayer.definitionExpression = "都道府県 = '" + prefecture + "'";
+      zoomToLayer();
+    } else {
+      view.extent = default_extend;
+    }
+
+
+    function zoomToLayer() {
+      return shihyoLayer.queryExtent().then(function(response) {
+        view.goTo(response.extent.clone().expand(1.2))
+          .catch(function(error){
+          if (error.name != "AbortError"){
+            console.error(error);
+          }
+        });
+      });
+    }
+  }
+});
+    </script>
+
+  
+
+</body>
+
+</html>
+ 
