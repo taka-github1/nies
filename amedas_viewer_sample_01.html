@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="ja" >
 
 <head>
 
@@ -93,7 +93,7 @@ h2 {
   <body>
     <div id="mainDiv">
       <div id="headerDiv">
-        <h2>指標（年別）</h2>
+        <h2>指標</h2>
         <div class="button dropdown"> 
           <select id="bunruiselector">
             <option value="年間値">年間値</option>
@@ -280,7 +280,7 @@ require([
 
   $('#shihyoselector').change(function() {
     setLayer();
-    zoomLayer();
+    //zoomLayer();
   })
 
   $('#monthshihyoselector').change(function() {
@@ -333,13 +333,11 @@ require([
     var year = yearSlider.values[0];
     shihyoLayer.definitionExpression =  "年 = " + String(year);
 
-    /*
     view.whenLayerView(shihyoLayer).then(function (featureLayerView) {
       featureLayerView.filter = {
         where: "年 = " + String(year)
       };
     });
-    */
 
   }
 
