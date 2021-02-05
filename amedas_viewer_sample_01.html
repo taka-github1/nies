@@ -122,7 +122,7 @@ h2 {
             <option value="日降雪量の年最大値">日降雪量の年最大値(cm)</option>
           </select>
         </div>
-        <h2>対象年</h2>
+        <h2>観測年</h2>
         <div id="yearselector" class="slider"></div>
         <h2>観測所選択</h2>
         <div class="button dropdown"> 
@@ -333,11 +333,13 @@ require([
     var year = yearSlider.values[0];
     shihyoLayer.definitionExpression =  "年 = " + String(year);
 
+    /*
     view.whenLayerView(shihyoLayer).then(function (featureLayerView) {
       featureLayerView.filter = {
         where: "年 = " + String(year)
       };
     });
+    */
 
   }
 
@@ -478,13 +480,15 @@ require([
 
     var prefecture = $('#prefectureselector').val();
     var observatory =  $('#observatoryselector').val();
+    var year = yearSlider.values[0];
+    
     shihyoLayer.definitionExpression = "";
 
     if (observatory != "全て"){
-      shihyoLayer.definitionExpression = "観測地点名 = '" + observatory + "'";
+      shihyoLayer.definitionExpression = "観測地点名 = '" + observatory + "' AND 年 = " + String(year);
       zoomToLayer();
     } else if (prefecture != "全国") {
-      shihyoLayer.definitionExpression = "都道府県 = '" + prefecture + "'";
+      shihyoLayer.definitionExpression = "都道府県 = '" + prefecture + "' AND 年 = " + String(year);
       zoomToLayer();
     } else {
       view.extent = default_extend;
