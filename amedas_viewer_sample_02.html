@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="ja" >
+<html lang="en" >
 
 <head>
 
@@ -297,6 +297,7 @@ require([
   view.when(function() {
     setForm(true);
     setFilter(false);
+    draw_charts();
   });
 
   view.popup.on("trigger-action", function(event){
@@ -418,7 +419,6 @@ require([
         }];
         
         legend.layerInfos.layer = shihyoLayer;
-        //legend.layerInfos.layer.title = "凡例";
 
         layers[i].visible = true;
       } else {
@@ -630,49 +630,6 @@ require([
     }
   }
   
-  function setFilter2(
-     bunrui,
-     prefecture,
-     observatory,
-     year,
-     month
-  ) {
-
-    shihyoLayer.definitionExpression = "";
-    
-    var expression = "年 = " + String(year);
-    
-    if (bunrui == "月別値") { 
-      expression = expression + " AND 月 = " + month;
-    }
-    
-    if (observatory != "全て"){
-      shihyoLayer.definitionExpression = expression + " AND 観測地点名 = '" + observatory + "'";
-      
-      if (zoom_flg){
-        zoomToLayer();
-      }
-    } else if (prefecture != "全国") {
-      shihyoLayer.definitionExpression = expression + " AND 都道府県 = '" + prefecture + "'";
-      zoomToLayer();
-    } else {
-      shihyoLayer.definitionExpression = expression;
-      view.extent = default_extend;
-    }
-
-
-    function zoomToLayer() {
-      return shihyoLayer.queryExtent().then(function(response) {
-        view.goTo(response.extent.clone().expand(1.2))
-          .catch(function(error){
-          if (error.name != "AbortError"){
-            console.error(error);
-          }
-        });
-      });
-    }
-  }
-
   function draw_charts(observatory) {
 
     var bunrui = $('#bunruiselector').val();
