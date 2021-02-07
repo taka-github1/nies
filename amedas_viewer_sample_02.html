@@ -68,7 +68,7 @@ h2 {
 
 #yearselector{
   width: 90%;
-  height: 70px;
+  height: 50px;
 }
 
 
@@ -99,6 +99,11 @@ h2 {
 
 .esri-popup__inline-actions-container:only-child>.esri-popup__action, .esri-popup__inline-actions-container:only-child>.esri-popup__action-toggle {
     max-width: 30% !important;
+}
+
+.button {
+  height: 25px;
+  width: 120px;
 }
 </style>
 
@@ -176,6 +181,12 @@ h2 {
           <div class="chart-panel">
             <canvas id="chartCanvas"/>
           </div>
+        </div>
+        <h2>CSVダウンロード</h2>
+        <div class="download">
+          <button class="button" id="csv_observatory">選択した観測所</button>
+          <button class="button" id="csv_maparea">マップ表示のみ</button>
+          <a id="download_link" href="#" download="test.txt" style="display: none">ダウンロード</a>
         </div>
       </div>
       <div id="viewDiv"></div>
@@ -350,6 +361,14 @@ require([
     setForm(false);
     setFilter(false);
     draw_charts();
+  })
+  
+  $('#csv_observatory').click(function() {
+    download_csv(0);
+  })
+    
+  $('#csv_maparea').click(function() {
+    download_csv(1);
   })
   
 
@@ -781,6 +800,118 @@ require([
 
       }
     });
+  }
+  
+
+  function download_csv(flg) {
+    
+    var bunrui = $('#bunruiselector').val();
+    var shihyo = $('#shihyoselector').val();
+    var shihyotxt = $('#shihyoselector option:selected').text();
+    
+    var prefecture = $('#prefectureselector').val();
+    var observatory =  $('#observatoryselector').val();
+    
+    var year = yearSlider.values[0];
+    var month =  $('#monthselector').val();
+
+
+    //1時間で始まる指標には先頭にFをつける
+    var regex = new RegExp(/^1.*$/);
+    if (regex.test(shihyo)) {
+      shihyo = "F" + shihyo;
+    }
+    
+    var fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", shihyo];
+    
+    if (bunrui == "月別値") {
+      fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", "月", shihyo];
+    }
+    
+    var query = shihyoLayer.createQuery();
+
+    var expression = "年 = " + year;
+    if (bunrui == "月別値") {
+      expression = "年 = " + year + " AND 月 = " + month;
+    }
+    
+    if (flg == 0) {
+      if (observatory != "全て"){
+        query.where = expression + " AND 観測地点名 = '" + observatory + "'";
+        shihyotxt = shihyotxt + "_" + observatory;
+      } else if (prefecture != "全国") {
+        query.where = expression + " AND 都道府県 = '" + prefecture + "'";
+        shihyotxt = shihyotxt + "_" + prefecture;
+      } else {
+        query.where = expression;
+        shihyotxt = shihyotxt + "_全国";
+      }
+    } else {
+      
+      query.geometry = view.extent;
+      shihyotxt = shihyotxt + "_マップ範囲";
+    }
+    
+    query.outFields = fields;
+    
+    query.orderByFields = "地点番号,年";
+    if (bunrui == "月別値") {
+      query.orderByFields = "地点番号,年,月";
+    }
+    
+    query.returnGeometry = false;
+    query.maxRecordCountFactor = 10;
+
+    var records = [];
+    
+    shihyoLayer.queryFeatures(query)
+      .then(function(response){
+      var features = response.features;
+
+      for (let i = 0; i < features.length; ++i) {
+        var att = features[i].attributes;
+        
+        var record = [];
+        for (let j = 0; j < fields.length; ++j) {
+          record.push(att[fields[j]]);
+        }
+        records.push(record);
+      }
+      
+      startDownload(shihyotxt, fields, records);
+    });
+
+
+    function startDownload(shihyo, fields, records) {
+      const filename = "アメダス_" + shihyo + '.csv';
+      
+      var csv_text = fields.join(',') + "\r\n";
+      
+      for (let i = 0; i < records.length; ++i) {
+        for (let j = 0; j < records[i].length; ++j) {
+          csv_text = csv_text + records[i][j] + ",";
+        }
+        csv_text = csv_text + "\r\n";
+      }
+      
+      //BOMを付与する（Excelでの文字化け対策）
+      const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+      //Blobでデータを作成する
+      const blob = new Blob([bom, csv_text], { type: 'text/csv'});
+
+      //IE10/11用
+      if (window.navigator.msSaveBlob) {
+        window.navigator.msSaveBlob(blob, filename);
+        //その他ブラウザ
+      } else {
+        const url = (window.URL || window.webkitURL).createObjectURL(blob);
+        const download = document.createElement('a');
+        download.href = url;
+        download.download = filename;
+        download.click();
+        (window.URL || window.webkitURL).revokeObjectURL(url);
+      }
+    }
   }
 });
     </script>
