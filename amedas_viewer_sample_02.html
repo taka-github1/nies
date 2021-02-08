@@ -52,6 +52,10 @@ h2 {
   margin-bottom: 0px;
 }
 
+p4 {
+  font-size: 12px;
+  margin-bottom: 0px;
+}
 .dropdown {
   position: relative;
   display:block;
@@ -171,13 +175,16 @@ h2 {
         </div>
         <h2>観測所選択</h2>
         <div class="dropdown"> 
+          <p4>都道府県</p4>
           <select id="prefectureselector">
             <option value="全国">全国</option>
-          </select>
+          </select><br/>
+          <p4>観測所　</p4>
           <select id="observatoryselector">
             <option value="全て">全て</option>
           </select>
         </div>
+        <h2>グラフ</h2>
         <div id="graphDiv">
           <div class="chart-panel">
             <canvas id="chartCanvas"/>
