@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="ja" >
 
 <head>
 
@@ -36,6 +36,7 @@ body{
 #headerDiv {
   width: 30%;
   height: 100%;
+  margin-right: 10px;
   display: flex;
   flex-direction: column;
 }
@@ -193,7 +194,7 @@ p4 {
         <h2>CSVダウンロード</h2>
         <div class="download">
           <button class="button" id="csv_observatory">選択した観測所</button>
-          <button class="button" id="csv_maparea">マップ表示のみ</button>
+          <button class="button" id="csv_maparea">マップ範囲のみ</button>
           <a id="download_link" href="#" download="test.txt" style="display: none">ダウンロード</a>
         </div>
       </div>
@@ -857,7 +858,7 @@ require([
     } else {
       
       query.geometry = view.extent;
-      shihyotxt = shihyotxt + "_マップ範囲";
+      shihyotxt = shihyotxt + "_マップ範囲のみ";
     }
     
     query.outFields = fields;
