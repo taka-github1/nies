@@ -195,15 +195,6 @@ h2 {
   
   
       <script id="rendered-js" >
-var portalUrl =  "https://nies.maps.arcgis.com";
-
-var info = new OAuthInfo({
-  appId: "VjtdTF1gx98VL1gA",
-  popup: false
-});
-
-identityManager.registerOAuthInfos([info]);
-identityManager.getCredential(portalUrl);
 
 var s8_graph_url = "https://services9.arcgis.com/wlu6GWBNU4aPwEwv/arcgis/rest/services/S8_Graph/FeatureServer"
 
@@ -215,7 +206,16 @@ require([
   "esri/identity/IdentityManager",
   "esri/layers/FeatureLayer",
 ], function (Portal, OAuthInfo, identityManager, FeatureLayer) {
+  var portalUrl =  "https://nies.maps.arcgis.com";
 
+  var info = new OAuthInfo({
+    appId: "VjtdTF1gx98VL1gA",
+    popup: false
+  });
+
+  identityManager.registerOAuthInfos([info]);
+  identityManager.getCredential(portalUrl);
+	
   setForm(true);
   //draw_charts();
 
