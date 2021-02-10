@@ -477,17 +477,20 @@ require([
 
   $('input[name="switch-rcp"]').change(function() {
     initLayer();
-    setLayer();
+    setLayer(); 
+    zoomArea();
   })
 
   $('input[name="switch-model"]').change(function() {
     initLayer();
     setLayer();
+    zoomArea();
   })
 
   $('input[name="switch-kikan"]').change(function() {
     initLayer();
     setLayer();
+    zoomArea();
   })
 
   $('#prefectureselector').change(function() {
