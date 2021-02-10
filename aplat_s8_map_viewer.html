@@ -466,11 +466,13 @@ require([
     initLayer();
     setForm(true);
     setLayer();
+    view.extent = default_extend;
   })
 
   $('input[name="switch-shihyo"]').change(function() {
-setForm(false);
+    setForm(false);
     setLayer();
+    view.extent = default_extend;
   })
 
   $('input[name="switch-rcp"]').change(function() {
@@ -572,7 +574,6 @@ setForm(false);
       });
 
       lgExpand.content = legend;
-      zoomArea();
     }  
   }
 
