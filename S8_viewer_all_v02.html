@@ -471,8 +471,7 @@ require([
   })
 
   $('input[name="switch-shihyo"]').change(function() {
-    setForm();
-    initLayer();
+    setForm(false);
     setLayer();
   })
 
@@ -872,6 +871,9 @@ require([
         var area = features[i].attributes["市町村名リスト"];
         $('#municipalitieselector').append($('<option>').html(area).val(area));
       }
+	    
+      setLayer();
+      zoomArea();
     });
   }
 
