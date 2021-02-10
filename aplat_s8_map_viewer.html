@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="ja" >
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>S8_map_viewer</title>
+  
+<style>
+html,
+body{
+  height: 100%;
+}
+
+#mainDiv {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+#headerDiv {
+  width: 35%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#viewDiv {
+  width: 65%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.switch-field {
+	display: flex;
+	margin-bottom: 10px;
+	overflow: hidden;
+}
+
+.switch-field input {
+	position: absolute !important;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	width: 1px;
+	border: 0;
+  display: none;
+	overflow: hidden;
+}
+
+.switch-field label {
+  min-width: 40px;
+  max-width: 120px;
+	background-color: #e4e4e4;
+	color: rgba(0, 0, 0, 0.6);
+	font-size: 12px;
+	line-height: 1;
+	text-align: center;
+	padding: 5px 7px;
+	margin-right: 0px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+	transition: all 0.1s ease-in-out;
+}
+
+.switch-field label:hover {
+	cursor: pointer;
+}
+
+.switch-field input:checked + label {
+	background-color: #a5dc86;
+	box-shadow: none;
+}
+
+.switch-field label:first-of-type {
+	border-radius: 4px 0 0 4px;
+}
+
+.switch-field label:last-of-type {
+	border-radius: 0 4px 4px 0;
+}
+
+h2 {
+	font-size: 14px;
+	margin-bottom: 0px;
+}
+
+p4 {
+  font-size: 12px;
+  margin-bottom: 0px;
+}
+
+#messageDiv {
+  font-size: 12px;
+  margin-bottom: 0px;
+}
+
+
+.dropdown {
+  position: relative;
+  display:block;
+  font-size: 16px;
+  margin-bottom: 12px;
+  padding:0;
+}
+
+#area-prefecture {
+  display: flex;
+}
+
+#area-municipalitie {
+  display: flex;
+}
+
+#area-meisho {
+  display: none;
+}
+
+#opacityselector{
+  width: 90%;
+  height: 50px;
+}
+
+.esri-widget {
+  font-size: 12px !important;
+}
+
+.esri-ui-corner .esri-expand .esri-widget--panel, .esri-ui-corner .esri-expand .esri-widget--panel-height-only, .esri-ui-corner .esri-component>.esri-widget--panel, .esri-ui-corner .esri-component.esri-widget--panel {
+  width: 200px !important;
+}
+
+.esri-popup__inline-actions-container:only-child>.esri-popup__action, .esri-popup__inline-actions-container:only-child>.esri-popup__action-toggle {
+  max-width: 30% !important;
+}
+
+.esri-legend__layer-caption {
+  display: none !important;
+}
+</style>
+
+  
+  
+  
+  
+
+</head>
+
+<body translate="no" >
+  <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+          name="viewport"
+          content="initial-scale=1,maximum-scale=1,user-scalable=no"
+          />
+    <title>S8</title>
+
+    <link
+          rel="stylesheet"
+          href="https://js.arcgis.com/4.18/esri/themes/light/main.css"
+          />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://js.arcgis.com/4.18/"></script>
+  </head>
+
+  <body>
+    <div id="mainDiv">
+      <div id="headerDiv">
+        <h2>分野</h2>
+        <div class="switch-field">
+          <input type="radio" id="radio-KIKOU" name="switch-bunya" value="KIKOU" checked/>
+          <label for="radio-KIKOU">気候</label>
+          <input type="radio" id="radio-NOUGYOU" name="switch-bunya" value="NOUGYOU" />
+          <label for="radio-NOUGYOU">農業</label>
+          <input type="radio" id="radio-MIZUKANKYO" name="switch-bunya" value="MIZUKANKYO" />
+          <label for="radio-MIZUKANKYO">水環境</label>
+          <input type="radio" id="radio-SHIZENSEITAI" name="switch-bunya" value="SHIZENSEITAI" />
+          <label for="radio-SHIZENSEITAI">自然生態系</label>
+          <input type="radio" id="radio-SHIZENSAIGAI" name="switch-bunya" value="SHIZENSAIGAI" />
+          <label for="radio-SHIZENSAIGAI">自然災害</label>
+          <input type="radio" id="radio-KENKOU" name="switch-bunya" value="KENKOU" />
+          <label for="radio-KENKOU">健康</label>
+        </div>
+        <h2>気候・影響指標</h2>
+        <div id="KIKOU-SHIHYO" class="switch-field">
+          <input type="radio" id="radio-Temperature" name="switch-shihyo" value="Temperature" checked/>
+          <label for="radio-Temperature">年平均気温</label>
+          <input type="radio" id="radio-Precipitation" name="switch-shihyo" value="Precipitation" />
+          <label for="radio-Precipitation">年降水量</label>
+        </div>
+        <div id="NOUGYOU-SHIHYO" class="switch-field" style="display:none">
+          <input type="radio" id="radio-AgricultureRiceAdp0" name="switch-shihyo" value="AgricultureRiceAdp0" />
+          <label for="radio-AgricultureRiceAdp0">コメ収量（収量重視）</label>
+          <input type="radio" id="radio-AgricultureRiceLRAdp0" name="switch-shihyo" value="AgricultureRiceLRAdp0" />
+          <label for="radio-AgricultureRiceLRAdp0">コメ収量（品質重視）</label>
+        </div>
+        <div id="MIZUKANKYO-SHIHYO" class="switch-field" style="display:none">
+          <input type="radio" id="radio-KUROROMAX" name="switch-shihyo" value="KUROROMAX" />
+          <label for="radio-KUROROMAX">クロロフィルa濃度<br/>（年最高）</label>
+          <input type="radio" id="radio-KUROROAVG" name="switch-shihyo" value="KUROROAVG" />
+          <label for="radio-KUROROAVG">クロロフィルa濃度<br/>（年平均）</label>
+        </div>
+        <div id="SHIZENSEITAI-SHIHYO" class="switch-field" style="display:none">
+          <input type="radio" id="radio-ForestQacuta" name="switch-shihyo" value="ForestQacuta" />
+          <label for="radio-ForestQacuta">アカガシ</label>
+          <input type="radio" id="radio-ForestAVietchii" name="switch-shihyo" value="ForestAVietchii"/>
+          <label for="radio-ForestAVietchii">シラビソ</label>
+          <input type="radio" id="radio-ForestPinusPumila" name="switch-shihyo" value="ForestPinusPumila" />
+          <label for="radio-ForestPinusPumila">ハイマツ</label>
+          <input type="radio" id="radio-ForestFagus" name="switch-shihyo" value="ForestFagus" />
+          <label for="radio-ForestFagus">ブナ</label>
+        </div>
+        <div id="SHIZENSAIGAI-SHIHYO" class="switch-field" style="display:none">
+          <input type="radio" id="radio-DisasterSFGCMc" name="switch-shihyo" value="DisasterSFGCMc" />
+          <label for="radio-DisasterSFGCMc">斜面崩壊発生確率</label>
+          <input type="radio" id="radio-BEACH" name="switch-shihyo" value="BEACH" />
+          <label for="radio-BEACH">砂浜消失率</label>
+        </div>
+        <div id="KENKOU-SHIHYO" class="switch-field" style="display:none">
+          <input type="radio" id="radio-HealthEAAD" name="switch-shihyo" value="HealthEAAD" />
+          <label for="radio-HealthEAAD">ヒトスジシマカ</label>
+          <input type="radio" id="radio-HEAT_DISORDER" name="switch-shihyo" value="HEAT_DISORDER" />
+          <label for="radio-HEAT_DISORDER">熱中症<br/>搬送者数</label>
+          <input type="radio" id="radio-HEAT_STRESS" name="switch-shihyo" value="HEAT_STRESS" hidden/>
+          <label for="radio-HEAT_STRESS">熱ストレス超過<br/>死亡者数</label>
+        </div>
+        <h2>気候モデル</h2>
+        <div class="switch-field">
+          <input type="radio" id="radio-MIROC" name="switch-model" value="MIROC" checked/>
+          <label for="radio-MIROC" id="label-MIROC5">MIROC5</label>
+          <input type="radio" id="radio-MRI" name="switch-model" value="MRI" />
+          <label for="radio-MRI" id="label-MRI">MRI<br/>CGCM3.0</label>
+          <input type="radio" id="radio-GFDL" name="switch-model" value="GFDL" />
+          <label for="radio-GFDL" id="label-GFDL">GFDL CM3</label>
+          <input type="radio" id="radio-HadGem" name="switch-model" value="HadGEM" />
+          <label for="radio-HadGem" id="label-HadGem">HadGEM2<br/>ES</label>
+        </div>
+        <h2>排出シナリオ</h2>
+        <div class="switch-field">
+          <input type="radio" id="radio-RCP26" name="switch-rcp" value="RCP26" checked/>
+          <label for="radio-RCP26">RCP 2.6</label>
+          <input type="radio" id="radio-RCP45" name="switch-rcp" value="RCP45" />
+          <label for="radio-RCP45">RCP 4.5</label>
+          <input type="radio" id="radio-RCP85" name="switch-rcp" value="RCP85"/>
+          <label for="radio-RCP85">RCP 8.5</label>
+        </div>
+        <h2>対象期間</h2>
+        <div id="KIKAN-BASE" class="switch-field">
+          <input type="radio" id="radio-RBASEYEAR" name="switch-kikan" value="RBASEYEAR" checked/>
+          <label for="radio-RBASEYEAR" id="label-RBASEYEAR">現在</label>
+          <input type="radio" id="radio-R2031_2050" name="switch-kikan" value="R2031_2050" />
+          <label for="radio-R2031_2050" id="label-R2031_2050">21世紀半ば</label>
+          <input type="radio" id="radio-R2081_2100" name="switch-kikan" value="R2081_2100" />
+          <label for="radio-R2081_2100" id="label-R2081_2100">21世紀末</label>
+        </div>
+        <div id="KIKAN-DIFF" class="switch-field">
+          <input type="radio" id="radio-R3150" name="switch-kikan" value="R3150" />
+          <label for="radio-R3150" id="label-R3150">比較（21世紀半ば）</label>
+          <input type="radio" id="radio-R8100" name="switch-kikan" value="R8100" />
+          <label for="radio-R8100" id="label-R8100">比較（21世紀末）</label>
+        </div>
+        <h2>対象エリア</h2>
+        <div class="dropdown"> 
+          <div id="area-prefecture">
+            <p4>都道府県</p4>
+            <select id="prefectureselector">
+              <option value="全国">全国</option>
+            </select>
+          </div>
+          <div id="area-municipalitie">
+            <p4>市町村　</p4>
+            <select id="municipalitieselector">
+              <option value="全て">全て</option>
+            </select>
+          </div>
+          <div id="area-meisho">
+            <p4>名称　　</p4>
+            <select id="meishoselector">
+              <option value="全て">全て</option>
+            </select>
+          </div>
+        </div>
+        <h2>透過率</h2>
+        <div id="opacityselector" class="slider"></div>
+        <h2>備考</h2>
+        <div id="messageDiv"></div>
+      </div>
+      <div id="viewDiv"></div>
+    </div>
+  </body>
+</html>
+  
+  
+      <script id="rendered-js" >
+var map = null;
+var view = null;
+var legend = null;
+var current_field = null;
+var left_layer = null;
+var prefecture_tileLayer = null;
+var graphicsLayer = null;
+var groupLayer = null;
+
+var default_extend = {
+  xmin: 126.2331,
+  ymin: 31.367,
+  xmax: 151.5675,
+  ymax: 44.3821
+}
+
+
+const shihyo_list = {
+  Temperature: '年平均気温', 
+  Precipitation: '年降水量', 
+  AgricultureRiceAdp0: 'コメ収量（収量重視）', 
+  AgricultureRiceLRAdp0: 'コメ収量（品質重視）', 
+  KUROROMAX: 'クロロフィルa濃度（年最高）', 
+  KUROROAVG: 'クロロフィルa濃度（年平均）', 
+  ForestQacuta: 'アカガシ', 
+  ForestAVietchii: 'シラビソ', 
+  ForestPinusPumila: 'ハイマツ', 
+  ForestFagus: 'ブナ', 
+  DisasterSFGCMc: '斜面崩壊発生確率', 
+  BEACH: '砂浜消失率', 
+  HealthEAAD: 'ヒトスジシマカ', 
+  HEAT_DISORDER: '熱中症搬送者数', 
+  HEAT_STRESS: '熱ストレス超過死亡者数', 
+
+};
+
+const featurelayer_list = {
+  KUROROMAX: "S8_Chlorophyll_3619_2522",
+  KUROROAVG: "S8_Chlorophyll_3619",
+  BEACH: "S8_Beach_7205",
+  HEAT_DISORDER: "S8_Heat_Disorder_2663",
+  HEAT_STRESS: "S8_Heat_Stress_594"
+}
+
+require([
+  "esri/portal/Portal",
+  "esri/identity/OAuthInfo",
+  "esri/identity/IdentityManager",
+  "esri/Map",
+  "esri/WebMap",
+  "esri/views/MapView",
+  "esri/layers/TileLayer",
+  "esri/layers/FeatureLayer",
+  "esri/layers/GraphicsLayer",
+  "esri/layers/GroupLayer",
+  "esri/widgets/Home",
+  "esri/widgets/LayerList",
+  "esri/widgets/Legend",
+  "esri/widgets/Slider",
+  "esri/widgets/Expand",
+  "esri/widgets/BasemapGallery",
+  "esri/geometry/Extent",
+  "esri/geometry/Polygon",
+  "esri/renderers/Renderer"
+], function (Portal, OAuthInfo, identityManager, Map, WebMap, MapView, TileLayer, FeatureLayer, GraphicsLayer, GroupLayer, 
+              Home, LayerList, Legend, Slider, Expand, BasemapGallery, Extent, Polygon, Renderer) {
+  var portalUrl =  "https://nies.maps.arcgis.com";
+
+  var info = new OAuthInfo({
+    appId: "dk9ozouchIpZXrqT",
+    popup: false
+  });
+
+  identityManager.registerOAuthInfos([info]);
+  identityManager.getCredential(portalUrl);
+  
+  var tile_base_url = "https://tiles.arcgis.com/tiles/wlu6GWBNU4aPwEwv/arcgis/rest/services/";
+
+  map = new WebMap({
+    portalItem: {
+      id: "845743cc8fa749b089874a8bc441b7df"
+    }
+  });
+
+  view = new MapView({
+    container: "viewDiv",
+    map: map,
+    zoom: 14
+  });
+
+  const shichosonkai = new FeatureLayer({
+    portalItem: {
+      id: "f085d183c3af4f57b6afca64d2475d8f"
+    }
+  });
+
+  graphicsLayer = new GraphicsLayer({
+    blendMode: "destination-in",
+    title: "prefecture_graphic"
+  });
+
+  prefecture_tileLayer = new TileLayer({
+    title: "prefecture_tile"
+  });
+
+  groupLayer = new GroupLayer({
+    title: "prefecture_cut_grouplayer",
+    layers: [
+      prefecture_tileLayer,
+      graphicsLayer
+    ]
+  });
+
+  var homeBtn = new Home({
+    view: view
+  });
+  view.ui.add(homeBtn, "top-left");
+
+  var basemapGallery = new BasemapGallery({
+    view: view,
+    container: document.createElement("div")
+  });
+
+  var bgExpand = new Expand({
+    view: view,
+    content: basemapGallery
+  });
+
+  basemapGallery.watch("activeBasemap", function () {
+    var mobileSize =
+        view.heightBreakpoint === "xsmall" ||
+        view.widthBreakpoint === "xsmall";
+
+    if (mobileSize) {
+      bgExpand.collapse();
+    }
+  });
+  view.ui.add(bgExpand, "top-right");
+
+  var opacitySlider = new Slider({
+    container: "opacityselector",
+    steps: 1,
+    labelInputsEnabled: true,
+    labelFormatFunction: function(value, type){
+      return value + "%";
+    },
+    values: [ 0 ],
+    min: 0,
+    max: 100,
+    visibleElements: {
+      labels: true,
+      rangeLabels: true
+    }
+  });
+
+  var lgExpand = new Expand({
+    view: view,
+    expanded: true,
+    mode : "floating"
+  });
+  view.ui.add(lgExpand, "bottom-right");
+
+  view.extent = default_extend;
+
+  view.when(function() {
+    setLayer();
+    setForm(false);
+    setOpacity();
+  });
+
+  $('input[name="switch-bunya"]').change(function() {
+    initLayer();
+    setForm(true);
+    setLayer();
+  })
+
+  $('input[name="switch-shihyo"]').change(function() {
+    setForm();
+    initLayer();
+    setLayer();
+  })
+
+  $('input[name="switch-rcp"]').change(function() {
+    initLayer();
+    setLayer();
+  })
+
+  $('input[name="switch-model"]').change(function() {
+    initLayer();
+    setLayer();
+  })
+
+  $('input[name="switch-kikan"]').change(function() {
+    initLayer();
+    setLayer();
+  })
+
+  $('#prefectureselector').change(function() {
+    setLayer();
+    setMunicipalitieselector(true);
+    zoomArea();
+  })
+
+  $('#municipalitieselector').change(function() {
+    zoomArea();
+  })
+
+  $('#meishoselector').change(function() {
+    zoomArea();
+  })
+
+  opacitySlider.on("thumb-change", function(event) {
+    setOpacity();
+  });
+  opacitySlider.on("thumb-drag", function(event) {
+    setOpacity();
+  });
+
+  function setLayer() {
+
+    map.remove(left_layer);
+    map.remove(groupLayer);
+
+    var bunya = $('input[name=switch-bunya]:checked').val();
+    var shihyo = $('input[name=switch-shihyo]:checked').val();
+    var shihyotxt = shihyo_list[shihyo];
+    var model = $('input[name=switch-model]:checked').val();
+    var rcp = $('input[name=switch-rcp]:checked').val();
+    var kikan = $('input[name=switch-kikan]:checked').val();
+
+    $('#messageDiv').html(getMessage());
+
+    var left_layer_url = "";
+
+    var layers = [];
+
+    if (kikan == "R3150" || kikan == "R8100") {
+      if (shihyo == "Temperature") {
+        kikan = kikan + "_DIFF";
+      }
+      if (shihyo == "Precipitation") {
+        kikan = kikan + "_RATE";
+      }
+      if (bunya == "NOUGYOU") {
+        kikan = kikan + "_RATE";
+      }
+    }
+
+    if (bunya == "MIZUKANKYO") {
+      var select_field = rcp + "_" + model + "_" + kikan +"_RATE";
+      create_renderer(shihyo, select_field, "ダム名称"); 
+    } else if (shihyo == "BEACH") {
+      var select_field = rcp + "_" + model + "_" + kikan;
+      create_renderer(shihyo, select_field, "砂浜名称"); 
+    } else if (shihyo == "HEAT_DISORDER" || shihyo == "HEAT_STRESS") {
+      var select_field = rcp + "_" + model + "_" + kikan;
+      create_renderer(shihyo, select_field, "都道府県"); 
+    } else {
+      var select_layer = shihyo + "_" + rcp + "_" + model + "_" + kikan;
+      left_layer_url = tile_base_url + select_layer + "/MapServer";
+
+      left_layer = new TileLayer({
+        url: left_layer_url,
+        title: shihyo
+      });
+      left_layer.effect = "opacity(100%)";
+
+      map.add(left_layer);
+      map.add(groupLayer);
+
+      legend = new Legend({
+        view: view,
+        layerInfos: [
+          {
+            layer: left_layer,
+            title: shihyotxt
+          }
+        ],
+        respectLayerVisibility: false
+      });
+
+      lgExpand.content = legend;
+      zoomArea();
+    }  
+  }
+
+  function setForm(flg){
+    var bunya = $('input[name=switch-bunya]:checked').val();
+    var model = $('input[name=switch-model]:checked').val();
+    var rcp = $('input[name=switch-rcp]:checked').val();
+    var kikan = $('input[name=switch-kikan]:checked').val();
+
+    //気候選択時
+    if (bunya == 'KIKOU'){
+      $('#KIKOU-SHIHYO').css('display', 'flex');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["Temperature"]);
+      }
+      //農業選択時
+    } else if (bunya == 'NOUGYOU'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'flex');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["AgricultureRiceAdp0"]);
+      }
+      //水環境選択時
+    } else if (bunya == 'MIZUKANKYO'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'flex');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["KUROROMAX"]);
+      }
+      //自然生態系
+    } else if (bunya == 'SHIZENSEITAI'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'flex');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["ForestQacuta"]);
+      }
+    } else if (bunya == 'SHIZENSAIGAI'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'flex');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["DisasterSFGCMc"]);
+      }
+    } else if (bunya == 'KENKOU'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'flex');
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["HealthEAAD"]);
+      }
+    }
+
+    var shihyo = $('input[name=switch-shihyo]:checked').val();
+
+    //気候シナリオ選択肢の制御
+    if (bunya == 'MIZUKANKYO'){
+      $('#label-MIROC').css('display', 'flex');
+      $('#label-MRI').css('display', 'flex');
+      $('#label-GFDL').css('display', 'none');
+      $('#label-HadGem').css('display', 'none');
+
+      if (model == "GFDL" || model == "HadGEM") {
+        $('input:radio[name="switch-model"]').val(["MIROC"]);
+      }
+    } else if (shihyo == 'BEACH') {
+      $('#label-MIROC').css('display', 'flex');
+      $('#label-MRI').css('display', 'flex');
+      $('#label-GFDL').css('display', 'none');
+      $('#label-HadGem').css('display', 'flex');
+
+      if (model == "GFDL") {
+        $('input:radio[name="switch-model"]').val(["MIROC"]);
+      }
+    } else {
+      $('#label-MIROC').css('display', 'flex');
+      $('#label-MRI').css('display', 'flex');
+      $('#label-GFDL').css('display', 'flex');
+      $('#label-HadGem').css('display', 'flex');
+    }
+
+
+    //対象期間の制御
+    $('#label-RBASEYEAR').css('display', 'flex');
+    $('#label-R2031_2050').css('display', 'flex');
+    $('#label-R2081_2100').css('display', 'flex');
+    $('#label-R3150').css('display', 'flex');
+    $('#label-R8100').css('display', 'flex');
+
+    if (shihyo == 'Temperature' || shihyo == 'Precipitation'){
+      $('#KIKAN-BASE').css('display', 'flex');
+      $('#KIKAN-DIFF').css('display', 'flex');
+    } else if (bunya == 'NOUGYOU'){
+      $('#KIKAN-BASE').css('display', 'none');
+      $('#KIKAN-DIFF').css('display', 'flex');
+      if (kikan != "R3150" && kikan != "R8100") {
+        $('input:radio[name="switch-kikan"]').val(["R3150"]);
+      }
+    } else if (bunya == 'MIZUKANKYO'){
+      $('#KIKAN-BASE').css('display', 'none');
+      $('#KIKAN-DIFF').css('display', 'flex');
+
+      if (kikan != "R3150" && kikan != "R8100") {
+        $('input:radio[name="switch-kikan"]').val(["R3150"]);
+      }
+    } else if (bunya == 'SHIZENSEITAI'){
+      $('#KIKAN-BASE').css('display', 'flex');
+      $('#KIKAN-DIFF').css('display', 'none');
+
+      $('#label-R2031_2050').css('display', 'none');
+
+      if (kikan == "R2031_2050" || kikan == "R3150" || kikan == "R8100") {
+        $('input:radio[name="switch-kikan"]').val(["RBASEYEAR"]);
+      }
+    } else if (shihyo == 'DisasterSFGCMc' || shihyo == 'HealthEAAD'){
+      $('#KIKAN-BASE').css('display', 'flex');
+      $('#KIKAN-DIFF').css('display', 'none');
+
+      if (kikan == "R3150" || kikan == "R8100") {
+        $('input:radio[name="switch-kikan"]').val(["RBASEYEAR"]);
+      }
+    } else if (shihyo == "BEACH") {
+      $('#KIKAN-BASE').css('display', 'flex');
+      $('#KIKAN-DIFF').css('display', 'none');
+
+      $('#label-RBASEYEAR').css('display', 'none');
+
+      if (kikan == "RBASEYEAR") {
+        $('input:radio[name="switch-kikan"]').val(["R2031_2050"]);
+      }
+    } else if (shihyo == "HEAT_DISORDER" || shihyo == "HEAT_STRESS") {
+      $('#KIKAN-BASE').css('display', 'flex');
+      $('#KIKAN-DIFF').css('display', 'none');
+
+      $('#label-RBASEYEAR').css('display', 'none');
+
+      if (kikan == "RBASEYEAR") {
+        $('input:radio[name="switch-kikan"]').val(["R2031_2050"]);
+      }
+    } else{
+      $('#KIKAN-BASE').css('display', 'flex');
+      $('#KIKAN-DIFF').css('display', 'flex');
+    }
+
+    //対象エリアの制御
+    if (bunya == 'MIZUKANKYO' || shihyo == "BEACH"){
+      $('#area-prefecture').css('display', 'none');
+      $('#area-municipalitie').css('display', 'none');
+      $('#area-meisho').css('display', 'flex');
+    } else if (shihyo == "HEAT_DISORDER" || shihyo == "HEAT_STRESS") {
+      $('#area-prefecture').css('display', 'flex');
+      $('#area-municipalitie').css('display', 'none');
+      $('#area-meisho').css('display', 'none');
+    } else {
+      $('#area-prefecture').css('display', 'flex');
+      $('#area-municipalitie').css('display', 'flex');
+      $('#area-meisho').css('display', 'none');
+    }
+
+
+    var query = shichosonkai.createQuery();
+
+    query.where = "1 = 1";
+    query.outFields = [
+      "KENCODE"
+    ];
+    query.orderByFields = "KENCODE";
+    query.groupByFieldsForStatistics = "KENCODE";
+
+    query.outStatistics = [
+      {
+        statisticType: "min",
+        onStatisticField: "KEN",
+        outStatisticFieldName: "都道府県リスト"
+      }
+    ]
+
+    shichosonkai.queryFeatures(query)
+      .then(function(response){
+      var features = response.features;
+      var recordes = [];
+      $('#prefectureselector > option').remove();
+      $('#prefectureselector').append($('<option>').html("全国").val("全国"));
+
+      for(var i = 0; i< features.length; i++) {
+        var ken = features[i].attributes["都道府県リスト"];
+        $('#prefectureselector').append($('<option>').html(ken).val(ken));
+
+      }
+      $('#prefectureselector').prop("selectedIndex", 0);
+
+      setMunicipalitieselector(true);
+    });
+
+    //名称選択肢生成
+    if (bunya == "MIZUKANKYO" || shihyo == "BEACH") {
+      var layer_id = featurelayer_list[shihyo]; 
+      var current_layer = map.findLayerById(layer_id);
+
+      query = current_layer.createQuery();
+
+      query.where = "1 = 1";
+      query.outFields = [
+        "NAME"
+      ];
+      query.orderByFields = "CODE";
+
+      current_layer.queryFeatures(query)
+        .then(function(response){
+        var features = response.features;
+        var recordes = [];
+        $('#meishoselector > option').remove();
+        $('#meishoselector').append($('<option>').html("全て").val("全て"));
+
+        for(var i = 0; i< features.length; i++) {
+          var name = features[i].attributes["NAME"];
+          $('#meishoselector').append($('<option>').html(name).val(name));
+
+        }
+        $('#meishoselector').prop("selectedIndex", 0);
+      });
+    }
+  }
+
+  function setMunicipalitieselector(init_flg) {
+
+    var prefecture = $('#prefectureselector').val();
+
+    let query = shichosonkai.createQuery();
+
+    if (prefecture == "全国") {
+      query.where = "1 = 1";
+    } else {
+      query.where = "KEN= '" + prefecture + "'";
+    }
+
+    query.outFields = [
+      "KEN", "SIKUCHOSON"
+    ];
+    query.orderByFields = "SIKUCHOSONCODE";
+    query.groupByFieldsForStatistics = ["KEN", "SIKUCHOSONCODE"];
+
+    query.outStatistics = [
+      {
+        statisticType: "min",
+        onStatisticField: "KEN",
+        outStatisticFieldName: "都道府県リスト"
+      },
+      {
+        statisticType: "min",
+        onStatisticField: "SIKUCHOSON",
+        outStatisticFieldName: "市町村名リスト"
+      }  
+    ];
+    query.returnGeometry = false;
+
+    $('#municipalitieselector > option').remove();
+    $('#municipalitieselector').append($('<option>').html("全て").val("全て"));
+    if (init_flg) {
+      $('#municipalitieselector').prop("selectedIndex", 0);
+    }
+    shichosonkai.queryFeatures(query)
+      .then(function(response){
+      var features = response.features;
+
+      for(var i = 0; i< features.length; i++) {
+        var area = features[i].attributes["市町村名リスト"];
+        $('#municipalitieselector').append($('<option>').html(area).val(area));
+      }
+    });
+  }
+
+
+  function zoomArea() {
+
+    var bunya = $('input[name=switch-bunya]:checked').val();
+    var shihyo = $('input[name=switch-shihyo]:checked').val();
+    var prefecture = $('#prefectureselector').val();
+    var municipalitie = $('#municipalitieselector').val();
+    var meisho = $('#meishoselector').val();
+
+    if (bunya == "MIZUKANKYO" || shihyo == "BEACH") {
+
+      if (meisho == "全て") {
+        view.extent = default_extend;
+        return;
+      }
+
+      var layer_id = featurelayer_list[shihyo]; 
+      var current_layer = map.findLayerById(layer_id);
+
+      var query = current_layer.createQuery();
+
+      query.where = "NAME = '" + meisho + "'";
+      query.returnGeometry = true;
+
+      current_layer.queryFeatures(query)
+        .then(function(response){
+        var features = response.features;
+
+        for(var i = 0; i< features.length; i++) {
+
+          view.goTo(
+            {
+              center: [
+                features[i].geometry.longitude,
+                features[i].geometry.latitude
+              ],
+              zoom: 10
+            },
+            { duration: 100 }
+          );
+        }
+      });
+
+
+    } else if (shihyo == "HEAT_DISORDER" || shihyo == "HEAT_STRESS") {
+
+      var layer_id = featurelayer_list[shihyo]; 
+      var current_layer = map.findLayerById(layer_id);
+
+      if (prefecture == "全国") {
+        current_layer.definitionExpression = "1 = 1";
+        view.extent = default_extend;
+        return;
+      }
+
+      var query = current_layer.createQuery();
+
+      query.where = "KEN = '" + prefecture + "'";
+      query.returnGeometry = true;
+      query.outFields = ["KEN"];
+
+      current_layer.queryFeatures(query)
+        .then(function(response){
+        var features = response.features;
+
+        var extent = null;
+
+        for(var i = 0; i< features.length; i++) {
+          var ken = features[i].attributes["KEN"];
+
+          extent = features[i].geometry.extent;
+
+          view.goTo(
+            {
+              extent: extent.clone()
+            },
+            { duration: 100 }
+          );
+
+          current_layer.definitionExpression = "KEN = '" + ken + "'";
+        }
+
+
+      });
+
+    } else {
+      prefecture_tileLayer = new TileLayer({
+        url: left_layer.url
+      });
+
+      if (prefecture == "全国" && municipalitie == "全て") {
+        left_layer.visible = true;
+        groupLayer.visible = false;
+        view.extent = default_extend;
+        return;
+      }
+
+      var query = shichosonkai.createQuery();
+
+      if (municipalitie != "全て"){
+        query.where = "SIKUCHOSON = '" + municipalitie + "'";
+      } else if (prefecture != "全国") {
+        query.where = "KEN = '" + prefecture + "'";
+      } else {
+        query.where = "1 = 1";
+      }
+
+      query.returnGeometry = true;
+      query.outFields = ["*"];
+
+      shichosonkai.queryFeatures(query)
+        .then(function(response){
+        var features = response.features;
+
+        if (features.length > 0) {
+          left_layer.visible = false;
+          graphicsLayer.graphics.removeAll();
+          groupLayer.removeAll();
+
+          groupLayer.visible = true;
+
+          groupLayer.add(prefecture_tileLayer);
+          groupLayer.add(graphicsLayer);        
+        }
+        else {
+          left_layer.visible = true;
+          groupLayer.visible = false;
+        }
+
+        var polygon = new Polygon();
+        var xmax = null;
+        var xmin = null;
+        var ymax = null;
+        var ymin = null;
+
+        for(var i = 0; i< features.length; i++) {
+          graphicsLayer.graphics.add(features[i]);
+          var extent = features[i].geometry.extent;
+
+          if (xmin == null || xmin > extent.xmin) xmin = extent.xmin; 
+          if (xmax == null || xmax < extent.xmax) xmax = extent.xmax; 
+          if (ymin == null || ymin > extent.ymin) ymin = extent.ymin; 
+          if (ymax == null || ymax < extent.ymax) ymax = extent.ymax; 
+        }
+
+        var extent = new Extent({
+          xmin: xmin,
+          xmax: xmax,
+          ymin: ymin,
+          ymax: ymax
+        });
+        view.goTo(
+          {
+            extent: extent.clone().expand(1.2)
+          },
+          { duration: 100 }
+        );
+      });
+    }
+  }
+
+  function create_renderer(shihyo, field, name) {
+
+    var layer_id = featurelayer_list[shihyo]; 
+    var current_layer = map.findLayerById(layer_id);
+    var renderer = current_layer.renderer.clone();
+
+    renderer.field = field;
+    current_layer.renderer = renderer;
+
+    current_layer.popupTemplate = {
+      title: shihyo_list[shihyo],
+      outFields: ["*"],
+      content: [{
+        type: "fields",
+        fieldInfos: [{
+          fieldName: "NAME",
+          label: name
+        }, {
+          fieldName: field,
+          label: "値", 
+          format: {
+            digitSeparator: true,
+            places: 2
+          }
+        }]
+      }]
+    };
+
+    current_layer.visible = true;
+
+    legend = new Legend({
+      view: view,
+      layerInfos: [
+        {
+          layer: current_layer,
+          title: shihyo_list[shihyo]
+        }
+      ]
+    });
+    lgExpand.content = legend;
+
+  }
+
+  function initLayer() {
+    if (left_layer != null){
+      left_layer.visible = false;
+    }
+    graphicsLayer.graphics.removeAll();
+    groupLayer.removeAll();
+    groupLayer.visible = false;
+
+    //全てのフィーチャレイヤーを非表示
+    map.findLayerById(featurelayer_list["KUROROMAX"]).visible = false;
+    map.findLayerById(featurelayer_list["KUROROAVG"]).visible = false;
+    map.findLayerById(featurelayer_list["BEACH"]).visible = false;
+    map.findLayerById(featurelayer_list["HEAT_DISORDER"]).visible = false;
+    map.findLayerById(featurelayer_list["HEAT_STRESS"]).visible = false;
+    
+    map.findLayerById(featurelayer_list["HEAT_DISORDER"]).definitionExpression = "1 = 1";
+    map.findLayerById(featurelayer_list["HEAT_STRESS"]).definitionExpression = "1 = 1";
+  }
+
+  function setOpacity() {
+    var opacity = opacitySlider.values[0];
+
+    opacity = 1 - (opacity / 100);
+
+    if (left_layer != null){
+      left_layer.opacity = opacity;
+    }
+    graphicsLayer.opacity = opacity;
+    groupLayer.opacity = opacity;
+    map.findLayerById(featurelayer_list["KUROROMAX"]).opacity = opacity;
+    map.findLayerById(featurelayer_list["KUROROAVG"]).opacity = opacity;
+    map.findLayerById(featurelayer_list["BEACH"]).opacity = opacity;
+    map.findLayerById(featurelayer_list["HEAT_DISORDER"]).opacity = opacity;
+    map.findLayerById(featurelayer_list["HEAT_STRESS"]).opacity = opacity;
+  }
+
+  function getMessage() {
+    var bunya = $('input[name=switch-bunya]:checked').val();
+    var shihyo = $('input[name=switch-shihyo]:checked').val();
+
+    var message = "";
+
+    if (shihyo == "Temperature") { 
+      message = message + "格子間隔 = 約 1 km<br/><br/>";
+      message = message + "<b>排出シナリオと気候モデルに対する年平均気温の将来予測（基準期間との差）</b><br/>";
+      message = message + "データがない領域は、陸水部（湖や沼など）です。";
+      
+    } else if (shihyo == "Precipitation") { 
+      message = message + "格子間隔 = 約 1 km<br/><br/>";
+      message = message + "<b>排出シナリオと気候モデルに対する年降水量の将来予測（基準期間に対する相対値）</b><br/>";
+      message = message + "データがない領域は、陸水部（湖や沼など）です。";
+      
+    } else if (shihyo == "AgricultureRiceAdp0") { 
+      message = message + "格子間隔 = 約 10 km<br/><br/>";
+      message = message + "<b>コメ収量（収量重視）の将来予測</b><br/>";
+      message = message + "基準期間のコメの収量を１とした場合の相対値<br/>";
+      
+    } else if (shihyo == "AgricultureRiceLRAdp0") { 
+      message = message + "格子間隔 = 約 10 km<br/><br/>";
+      message = message + "<b>コメ収量（品質重視）の将来予測</b><br/>";
+      message = message + "高温に因る品質低下リスクが「低」の収量の将来予測。 基準期間の高温に因る品質低下リスクが「低」の収量を１とした場合の相対値。<br/>";
+      
+    } else if (shihyo == "KUROROMAX") { 
+      message = "準備中";
+      
+    } else if (shihyo == "KUROROAVG") {
+      message = "準備中";
+      
+    } else if (shihyo == "ForestQacuta") {
+      message = message + "格子間隔 = 約 1 km<br/><br/>";
+      message = message + "<b>アカガシ潜在生育域面積の将来変化予測</b><br/>";
+      
+    } else if (shihyo == "ForestAVietchii") {
+      message = message + "格子間隔 = 約 1 km<br/><br/>";
+      message = message + "<b>シラビソ潜在生育域面積の将来変化予測</b><br/>";
+      
+    } else if (shihyo == "ForestPinusPumila") {
+      message = message + "格子間隔 = 約 1 km<br/><br/>";
+      message = message + "<b>ハイマツ潜在生育域面積の将来変化予測</b><br/>";
+      
+    } else if (shihyo == "ForestFagus") {
+      message = message + "格子間隔 = 約 1 km<br/><br/>";
+      message = message + "<b>ブナ潜在生育域面積の将来変化予測</b><br/>";
+      
+    } else if (shihyo == "DisasterSFGCMc") {
+      message = message + "格子間隔 = 約 1 km<br/><br/>";
+      message = message + "<b>斜面崩壊現象の発生確率の将来予測</b><br/>";
+      
+    } else if (shihyo == "BEACH") {
+      message = message + "準備中";
+      
+    } else if (shihyo == "HealthEAAD") {
+      message = message + "格子間隔 = 約 1 km<br/><br/>";
+      message = message + "<b>ヒトスジシマカの生息域の将来予測（基準期間に対する相対値）</b><br/>";
+      
+      
+    } else if (shihyo == "HEAT_DISORDER") {
+      message = message + "<b>熱中症搬送者数の将来予測</b><br/>";
+      message = message + "基準期間における熱中症患者数を１とした場合の相対値";
+      
+    } else if (shihyo == "HEAT_STRESS") {
+      message = message + "<b>熱ストレスによる超過死亡者数の将来予測</b><br/>";
+      message = message + "基準期間における熱ストレスによる超過死亡者数を１とした場合の相対値";
+    }
+
+    return message;
+  }
+});
+    </script>
+
+  
+
+</body>
+
+</html>
