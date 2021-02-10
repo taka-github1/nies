@@ -112,7 +112,7 @@ p4 {
   height: 25px;
   width: 120px;
 }
-  
+
 .esri-legend__layer-caption {
   display: none !important;
 }
@@ -224,6 +224,7 @@ var default_extend = {
   xmax: 151.5675,
   ymax: 44.3821
 }
+
 
 require([
   "esri/Map",
@@ -761,7 +762,55 @@ require([
       fill: false
     });
 
+    var yLabel = "";
     
+    if (shihyo == "年平均気温") { 
+      yLabel = "年平均気温(℃)";
+    } else if (shihyo == "日最高気温の年平均  ") { 
+      yLabel = "日最高気温の年平均(℃)";
+    } else if (shihyo == "日最低気温の年平均") { 
+      yLabel = "日最低気温の年平均(℃)";
+    } else if (shihyo == "猛暑日の年間日数") { 
+      yLabel = "猛暑日（日最高気温35℃以上）の年間日数(日)";
+    } else if (shihyo == "真夏日の年間日数") { 
+      yLabel = "真夏日（日最高気温30℃以上）の年間日数(日)";
+    } else if (shihyo == "夏日の年間日数") {
+      yLabel = "夏日（日最高気温25℃以上）の年間日数(日)";
+    } else if (shihyo == "熱帯夜の年間日数") {
+      yLabel = "熱帯夜（日最低気温25℃以上）の年間日数(日)";
+    } else if (shihyo == "冬日の年間日数") {
+      yLabel = "冬日（日最低気温0℃以下）の年間日数(日)";
+    } else if (shihyo == "真冬日の年間日数") {
+      yLabel = "真冬日（日最高気温0℃以下）の年間日数(日)";
+    } else if (shihyo == "年降水量") {
+      yLabel = "年降水量(mm)";
+    } else if (shihyo == "日降水量の年最大値") {
+      yLabel = "日降水量の年最大値(mm)";
+    } else if (shihyo == "日降水量100mm以上の年間日数") {
+      yLabel = "日降水量100mm以上の年間日数(日)";
+    } else if (shihyo == "日降水量200mm以上の年間日数") {
+      yLabel = "日降水量200mm以上の年間日数(日)";
+    } else if (shihyo == "1時間降水量30mm以上の年間発生回数") {
+      yLabel = "1時間降水量30mm以上の年間発生回数(回)";
+    } else if (shihyo == "1時間降水量50mm以上の年間発生回数") {
+      yLabel = "1時間降水量50mm以上の年間発生回数(回)";
+    } else if (shihyo == "無降水日年間日数") {
+      yLabel = "無降水日年間日数(日)";
+    } else if (shihyo == "年最大積雪深") {
+      yLabel = "年最大積雪深(cm)";
+    } else if (shihyo == "日降雪量の年最大値") {
+      yLabel = "日降雪量の年最大値(cm)";
+    } else if (shihyo == "月平均気温") {
+      yLabel = "月平均気温(℃)";
+    } else if (shihyo == "日最高気温の月平均") {
+      yLabel = "日最高気温の月平均(℃)";
+    } else if (shihyo == "日最低気温の月平均") {
+      yLabel = "日最低気温の月平均(℃) ";
+    } else if (shihyo == "月降水量") {
+      yLabel = "月降水量(mm)";
+    } else if (shihyo == "月最大積雪深") {
+      yLabel = "月最大積雪深(cm) ";
+    }
 
     chart = new Chart(ctx, {
       type: 'line',
@@ -792,6 +841,11 @@ require([
         },
         scales: {
           xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: '観測年',
+              fontSize: 12
+            },
             ticks: {
               beginAtZero: true,
               stepSize: 1,
@@ -801,6 +855,11 @@ require([
             }
           }],
           yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: yLabel,
+              fontSize: 12
+            },
             ticks: {
               beginAtZero: true,
               userCallback: function(label, index, labels) {
