@@ -1,0 +1,673 @@
+
+
+<!DOCTYPE html>
+<html lang="ja" >
+
+<head>
+
+  <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+<meta name="apple-mobile-web-app-title" content="CodePen">
+
+<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+<link rel="mask-icon" type="" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+
+
+  <title>CodePen - S8_Graph</title>
+  
+  
+  
+  
+<style>
+html,
+body{
+  height: 100%;
+},
+#headerDiv {
+  height: 40%;
+  display: flex;
+  flex-direction: column;
+}
+#graphDiv {
+  height: 60%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chart-panel {
+    display: flex;
+    flex-wrap: wrap; 
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    align-content: left;
+    padding: 0px;
+}
+
+.switch-field {
+	display: flex;
+	margin-bottom: 10px;
+	overflow: hidden;
+}
+
+.switch-field input {
+	position: absolute !important;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	width: 1px;
+	border: 0;
+	overflow: hidden;
+}
+
+.switch-field label {
+	background-color: #e4e4e4;
+	color: rgba(0, 0, 0, 0.6);
+	font-size: 14px;
+	line-height: 1;
+	text-align: center;
+	padding: 5px 10px;
+	margin-right: -1px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+	transition: all 0.1s ease-in-out;
+}
+
+.switch-field label:hover {
+	cursor: pointer;
+}
+
+.switch-field input:checked + label {
+	background-color: #a5dc86;
+	box-shadow: none;
+}
+
+.switch-field label:first-of-type {
+	border-radius: 4px 0 0 4px;
+}
+
+.switch-field label:last-of-type {
+	border-radius: 0 4px 4px 0;
+}
+
+h2 {
+	font-size: 14px;
+	margin-bottom: 0px;
+}
+
+.dropdown {
+  position: relative;
+  display:block;
+  font-size: 16px;
+  margin-bottom: 12px;
+  padding:0;
+}
+</style>
+
+  
+  
+  
+  
+
+</head>
+
+<body translate="no" >
+  <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+          name="viewport"
+          content="initial-scale=1,maximum-scale=1,user-scalable=no"
+          />
+    <title>S8</title>
+
+    <link
+          rel="stylesheet"
+          href="https://js.arcgis.com/4.18/esri/themes/light/main.css"
+          />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://js.arcgis.com/4.18/"></script>
+  </head>
+
+  <body>
+    <div id="headerDiv">
+      <h2>分野</h2>
+      <div class="switch-field">
+        <input type="radio" id="radio-KIKOU" name="switch-bunya" value="KIKOU" checked/>
+        <label for="radio-KIKOU">気候</label>
+        <input type="radio" id="radio-NOUGYOU" name="switch-bunya" value="NOUGYOU" />
+        <label for="radio-NOUGYOU">農業</label>
+        <input type="radio" id="radio-MIZUKANKYO" name="switch-bunya" value="MIZUKANKYO" />
+        <label for="radio-MIZUKANKYO">水環境</label>
+        <input type="radio" id="radio-SHIZENSEITAI" name="switch-bunya" value="SHIZENSEITAI" />
+        <label for="radio-SHIZENSEITAI">自然生態系</label>
+        <input type="radio" id="radio-SHIZENSAIGAI" name="switch-bunya" value="SHIZENSAIGAI" />
+        <label for="radio-SHIZENSAIGAI">自然災害</label>
+        <input type="radio" id="radio-KENKOU" name="switch-bunya" value="KENKOU" />
+        <label for="radio-KENKOU">健康</label>
+      </div>
+      <h2>気候・影響指標</h2>
+      <div id="KIKOU-SHIHYO" class="switch-field">
+        <input type="radio" id="radio-Temperature" name="switch-shihyo" value="Temperature" checked/>
+        <label for="radio-Temperature">年平均気温</label>
+        <input type="radio" id="radio-Precipitation" name="switch-shihyo" value="Precipitation" />
+        <label for="radio-Precipitation">年降水量</label>
+      </div>
+      <div id="NOUGYOU-SHIHYO" class="switch-field" style="display:none">
+        <input type="radio" id="radio-AgricultureRiceAdp0" name="switch-shihyo" value="AgricultureRiceAdp0" />
+        <label for="radio-AgricultureRiceAdp0">コメ収量（収量重視）</label>
+        <input type="radio" id="radio-AgricultureRiceLRAdp0" name="switch-shihyo" value="AgricultureRiceLRAdp0" />
+        <label for="radio-AgricultureRiceLRAdp0">コメ収量（品質重視）</label>
+      </div>
+      <div id="MIZUKANKYO-SHIHYO" class="switch-field" style="display:none">
+        <input type="radio" id="radio-KUROROMAX" name="switch-shihyo" value="Chlorophyll_max" />
+        <label for="radio-KUROROMAX">クロロフィルa濃度（年最高）</label>
+        <input type="radio" id="radio-KUROROAVG" name="switch-shihyo" value="Chlorophyll_avg" />
+        <label for="radio-KUROROAVG">クロロフィルa濃度（年平均）</label>
+      </div>
+      <div id="SHIZENSEITAI-SHIHYO" class="switch-field" style="display:none">
+        <input type="radio" id="radio-ForestQacuta" name="switch-shihyo" value="ForestQacuta" />
+        <label for="radio-ForestQacuta">アカガシ</label>
+        <input type="radio" id="radio-ForestAVietchii" name="switch-shihyo" value="ForestAVietchii" />
+        <label for="radio-ForestAVietchii">シラビソ</label>
+        <input type="radio" id="radio-ForestPinusPumila" name="switch-shihyo" value="ForestPinusPumila" />
+        <label for="radio-ForestPinusPumila">ハイマツ</label>
+        <input type="radio" id="radio-ForestFagus" name="switch-shihyo" value="ForestFagus" />
+        <label for="radio-ForestFagus">ブナ</label>
+      </div>
+      <div id="SHIZENSAIGAI-SHIHYO" class="switch-field" style="display:none">
+        <input type="radio" id="radio-DisasterSFGCMc" name="switch-shihyo" value="DisasterSFGCMc" />
+        <label for="radio-DisasterSFGCMc">斜面崩壊発生確率</label>
+        <input type="radio" id="radio-BEACH" name="switch-shihyo" value="Beach" />
+        <label for="radio-BEACH">砂浜消失率</label>
+      </div>
+      <div id="KENKOU-SHIHYO" class="switch-field" style="display:none">
+        <input type="radio" id="radio-HealthEAAD" name="switch-shihyo" value="HealthEAAD" />
+        <label for="radio-HealthEAAD">ヒトスジシマカ</label>
+        <input type="radio" id="radio-HEAT_DISORDER" name="switch-shihyo" value="HEAT_DISORDER" />
+        <label for="radio-HEAT_DISORDER">熱中症搬送者数</label>
+        <input type="radio" id="radio-HEAT_STRESS" name="switch-shihyo" value="HEAT_STRESS" hidden/>
+        <label for="radio-HEAT_STRESS">熱ストレス超過死亡者数</label>
+      </div>
+      <h2>対象エリア</h2>
+      <div class="button dropdown"> 
+        <select id="areaselector">
+          <option value="全国">全国</option>
+        </select>
+      </div>
+    </div>
+    <div id="graphDiv">
+      <div class="chart-panel">
+        <canvas id="chartCanvas"/>
+      </div>
+    </div>
+  </body>
+</html>
+  
+  
+      <script id="rendered-js" >
+var s8_graph_url = "https://services6.arcgis.com/YweFsHK2qzfki4O5/arcgis/rest/services/S8_Graph/FeatureServer"
+
+var chart = null;
+
+require([
+  "esri/layers/FeatureLayer",
+], function (FeatureLayer) {
+
+  setForm(true);
+  //draw_charts();
+
+  $('input[name="switch-bunya"]').change(function() {
+    setForm(true);
+    //draw_charts();
+  })
+
+  $('input[name="switch-shihyo"]').change(function() {
+    setForm(false);
+    //draw_charts();
+  })
+
+  $('#areaselector').change(function() {
+    draw_charts();
+  })
+
+  function draw_charts() {
+
+    var bunya = $('input[name=switch-bunya]:checked').val();
+    var shihyo = $('input[name=switch-shihyo]:checked').val();
+
+    var area = $('#areaselector').val();
+
+    //グラフ作成
+    var table = new FeatureLayer({
+      url: s8_graph_url + "/0"
+    }); 
+    var query = table.createQuery();
+    query.where = "SHIHYO = '" + shihyo + "' AND AREA = '" + area + "' ";
+    query.outFields = [
+      "SHIHYO", "AREA", "RCP", "GCM", "RBASEYEAR", "R2031_2050", "R2081_2100"
+    ];
+    query.returnGeometry = false;
+
+    table.queryFeatures(query)
+      .then(function(response){ 
+      var features = response.features;
+      var recordes = [];
+      for(var i = 0; i< features.length; i++) {
+        var rcp = features[i].attributes["RCP"];
+        var gcm = features[i].attributes["GCM"];
+        /*
+        var rbaseyear = features[i].attributes["RBASEYEAR"];
+        var r2031_2050 = features[i].attributes["R2031_2050"];
+        var r2081_2100 = features[i].attributes["R2081_2100"];
+        */
+        var rbaseyear = Math.round(features[i].attributes["RBASEYEAR"] * 100) / 100;
+        var r2031_2050 = Math.round(features[i].attributes["R2031_2050"] * 100) / 100;
+        var r2081_2100 = Math.round(features[i].attributes["R2081_2100"] * 100) / 100;
+        
+        var bunya = $('input[name=switch-bunya]:checked').val();
+
+        if (bunya == "SHIZENSEITAI") {
+          recordes[rcp + " " + gcm] = [rbaseyear, r2081_2100];
+        } else {
+          recordes[rcp + " " + gcm] = [rbaseyear, r2031_2050, r2081_2100];
+        }
+      }
+
+      update_chart(recordes);
+    });
+  }
+
+  function update_chart(data){
+
+    var ctx = document.getElementById("chartCanvas").getContext('2d');
+
+    if (chart != null) {
+      chart.destroy();
+    }
+
+    var bunya = $('input[name=switch-bunya]:checked').val();
+    var shihyo = $('input[name=switch-shihyo]:checked').val();
+
+    var labels = ["1981〜2000年", "2030～2050年", "2081〜2100年"];
+    if (bunya == "SHIZENSEITAI") {
+      labels = ["1981〜2000年", "2081〜2100年"]; 
+    }
+
+    var datasets = [];
+
+    datasets.push({
+      label: 'RCP2.6 MIROC',
+      data: data["RCP2.6 MIROC"],
+      pointStyle: "circle",
+      radius: 8,
+      backgroundColor: "rgba(0,169,255, 1)",
+      borderColor: "rgba(0,169,255,1)",
+      borderWidth: 2,
+      borderDash: [5, 1, 1], 
+      lineTension: 0,
+      fill: false
+    });
+
+    datasets.push({
+      label: 'RCP2.6 MRI',
+      data: data["RCP2.6 MRI"],
+      pointStyle: "triangle",
+      radius: 8,
+      backgroundColor: "rgba(0,169,255, 1)",
+      borderColor: "rgba(0,169,255,1)",
+      borderWidth: 2,
+      borderDash: [5, 5], 
+      lineTension: 0,
+      fill: false
+    });
+
+    if (bunya != "MIZUKANKYO" && shihyo != "Beach"){
+      datasets.push({
+        label: 'RCP2.6 GFDL',
+        data: data["RCP2.6 GFDL"],
+        pointStyle: "cross",
+        radius: 8,
+        backgroundColor: "rgba(0,169,255, 1)",
+        borderColor: "rgba(0,169,255,1)",
+        borderWidth: 2,
+        borderDash: [5, 1],
+        lineTension: 0,
+        fill: false
+      });
+    }
+
+    if (bunya != "MIZUKANKYO"){ 
+      datasets.push({
+        label: 'RCP2.6 HadGEM',
+        data: data["RCP2.6 HadGEM"],
+        pointStyle: "rect",
+        radius: 8,
+        backgroundColor: "rgba(0,169,255, 1)",
+        borderColor: "rgba(0,169,255,1)",
+        borderWidth: 2,
+        borderDash: [3, 1, 5],
+        lineTension: 0,
+        fill: false
+      });
+    }
+
+    datasets.push({
+      label: 'RCP4.5 MIROC',
+      data: data["RCP4.5 MIROC"],
+      pointStyle: "circle",
+      radius: 8,
+      backgroundColor: "rgba(100, 100, 100, 1)",
+      borderColor: "rgba(100, 100, 100, 1)",
+      borderWidth: 2,
+      borderDash: [5, 1, 1], 
+      lineTension: 0,
+      fill: false
+    });
+
+    datasets.push({
+      label: 'RCP4.5 MRI',
+      data: data["RCP4.5 MRI"],
+      pointStyle: "triangle",
+      radius: 8,
+      backgroundColor: "rgba(100, 100, 100, 1)",
+      borderColor: "rgba(100, 100, 100, 1)",
+      borderWidth: 2,
+      borderDash: [5, 5], 
+      lineTension: 0,
+      fill: false
+    });
+
+    if (bunya != "MIZUKANKYO" && shihyo != "Beach"){
+      datasets.push({
+        label: 'RCP4.5 GFDL',
+        data: data["RCP4.5 GFDL"],
+        pointStyle: "cross",
+        radius: 8,
+        backgroundColor: "rgba(100, 100, 100, 1)",
+        borderColor: "rgba(100, 100, 100, 1)",
+        borderWidth: 2,
+        borderDash: [5, 1],
+        lineTension: 0,
+        fill: false
+      });
+    }
+
+    if (bunya != "MIZUKANKYO"){ 
+      datasets.push({
+        label: 'RCP4.5 HadGEM',
+        data: data["RCP4.5 HadGEM"],
+        pointStyle: "rect",
+        radius: 8,
+        backgroundColor: "rgba(100, 100, 100, 1)",
+        borderColor: "rgba(100, 100, 100, 1)",
+        borderWidth: 2,
+        borderDash: [3, 1, 5],
+        lineTension: 0,
+        fill: false
+      });
+    }
+
+    datasets.push({
+      label: 'RCP8.5 MIROC',
+      data: data["RCP8.5 MIROC"],
+      pointStyle: "circle",
+      radius: 8,
+      backgroundColor: "rgba(255, 0, 0, 1)",
+      borderColor: "rgba(255, 0, 0, 1)",
+      borderWidth: 2,
+      borderDash: [5, 1, 1], 
+      lineTension: 0,
+      fill: false
+    });
+
+    datasets.push({
+      label: 'RCP8.5 MRI',
+      data: data["RCP8.5 MRI"],
+      pointStyle: "triangle",
+      radius: 8,
+      backgroundColor: "rgba(255, 0, 0, 1)",
+      borderColor: "rgba(255, 0, 0, 1)",
+      borderWidth: 2,
+      borderDash: [5, 5], 
+      lineTension: 0,
+      fill: false
+    });
+
+    if (bunya != "MIZUKANKYO" && shihyo != "Beach"){
+      datasets.push({
+        label: 'RCP8.5 GFDL',
+        data: data["RCP8.5 GFDL"],
+        pointStyle: "cross",
+        radius: 8,
+        backgroundColor: "rgba(255, 0, 0, 1)",
+        borderColor: "rgba(255, 0, 0, 1)",
+        borderWidth: 2,
+        borderDash: [5, 1],
+        lineTension: 0,
+        fill: false
+      });
+    }
+
+    if (bunya != "MIZUKANKYO"){ 
+      datasets.push({
+        label: 'RCP8.5 HadGEM',
+        data: data["RCP8.5 HadGEM"],
+        pointStyle: "rect",
+        radius: 8,
+        backgroundColor: "rgba(255, 0, 0, 1)",
+        borderColor: "rgba(255, 0, 0, 1)",
+        borderWidth: 2,
+        borderDash: [3, 1, 5],
+        lineTension: 0,
+        fill: false
+      });
+    }
+    
+    var yLabel = "";
+    
+    if (shihyo == "Temperature") { 
+      yLabel = "変化量（℃）";
+    } else if (shihyo == "Precipitation") { 
+      yLabel = "相対値（倍）";
+    } else if (shihyo == "AgricultureRiceAdp0") { 
+      yLabel = "相対値（倍）";
+    } else if (shihyo == "AgricultureRiceLRAdp0") { 
+      yLabel = "相対値（倍）";
+    } else if (shihyo == "Chlorophyll_max") { 
+      yLabel = "相対値（倍）";
+    } else if (shihyo == "Chlorophyll_avg") {
+      yLabel = "相対値（倍）";
+    } else if (shihyo == "ForestQacuta") {
+      yLabel = "分布率（％）";
+    } else if (shihyo == "ForestAVietchii") {
+      yLabel = "分布率（％）";
+    } else if (shihyo == "ForestPinusPumila") {
+      yLabel = "分布率（％）";
+    } else if (shihyo == "ForestFagus") {
+      yLabel = "分布率（％）";
+    } else if (shihyo == "DisasterSFGCMc") {
+      yLabel = "発生確率（％）";
+    } else if (shihyo == "Beach") {
+      yLabel = "発生確率（％）";
+    } else if (shihyo == "HealthEAAD") {
+      yLabel = "分布率（％）";
+    } else if (shihyo == "HEAT_DISORDER") {
+      yLabel = "相対値（倍）";
+    } else if (shihyo == "HEAT_STRESS") {
+      yLabel = "相対値（倍）";
+    }
+
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: datasets
+      },
+      options: {
+        title: {
+          display: false,
+          text: ''
+        },
+        layout: {
+          padding: {
+            left: 0,
+            right: 0,
+            top: 0
+          }
+        },
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 20,
+            usePointStyle: true,
+            padding: 10
+          }
+        },
+        scales: {
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: '期間',
+              fontSize: 14
+            },
+            ticks: {
+              suggestedMax: 10,
+              suggestedMin: 0,
+              stepSize: 0.5,
+              callback: function(value, index, values){
+                return  value
+              }
+            }
+          }],
+          yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: yLabel,
+              fontSize: 14
+            }
+          }]
+        },
+        
+        responsive: true,
+        maintainAspectRatio: false
+
+      }
+    });
+  }
+
+  function setForm(flg){
+    var bunya = $('input[name=switch-bunya]:checked').val();
+    var shihyo = $('input[name=switch-shihyo]:checked').val();
+
+    if (bunya == 'KIKOU'){
+      $('#KIKOU-SHIHYO').css('display', 'flex');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["Temperature"]);
+      }
+    } else if (bunya == 'NOUGYOU'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'flex');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["AgricultureRiceAdp0"]);
+      }
+    } else if (bunya == 'MIZUKANKYO'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'flex');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["Chlorophyll_max"]);
+      }
+    } else if (bunya == 'SHIZENSEITAI'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'flex');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["ForestQacuta"]);
+      }
+    } else if (bunya == 'SHIZENSAIGAI'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'flex');
+      $('#KENKOU-SHIHYO').css('display', 'none');
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["DisasterSFGCMc"]);
+      }
+    } else if (bunya == 'KENKOU'){
+      $('#KIKOU-SHIHYO').css('display', 'none');
+      $('#NOUGYOU-SHIHYO').css('display', 'none');
+      $('#MIZUKANKYO-SHIHYO').css('display', 'none');
+      $('#SHIZENSEITAI-SHIHYO').css('display', 'none');
+      $('#SHIZENSAIGAI-SHIHYO').css('display', 'none');
+      $('#KENKOU-SHIHYO').css('display', 'flex');
+      if (flg) {
+        $('input:radio[name="switch-shihyo"]').val(["HealthEAAD"]);
+      }
+    }
+    
+    shihyo = $('input[name=switch-shihyo]:checked').val();
+
+    var table = new FeatureLayer({
+      url: s8_graph_url + "/1"
+    }); 
+    var query = table.createQuery();
+
+    if (shihyo == "Beach") {
+      query.where = "shurui = 'Beach'";
+    } else if (bunya == "MIZUKANKYO") {
+      query.where = "shurui = 'Chlorophyll'";
+    } else {
+      query.where = "shurui = 'Prefecture'";
+    }
+    query.outFields = [
+      "shurui ", "code", "name" 
+    ];
+    query.orderByFields = "code";
+    query.returnGeometry = false;
+
+    table.queryFeatures(query)
+      .then(function(response){
+      var features = response.features;
+      var recordes = [];
+      $('#areaselector > option').remove();
+
+      for(var i = 0; i< features.length; i++) {
+        var area = features[i].attributes["name"];
+        $('#areaselector').append($('<option>').html(area).val(area));
+
+      }
+      $('#areaselector').prop("selectedIndex", 0);
+
+      draw_charts();
+    });
+  }
+
+});
+    </script>
+
+  
+
+</body>
+
+</html>
+ 
