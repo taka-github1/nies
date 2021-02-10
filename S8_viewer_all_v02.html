@@ -1093,6 +1093,9 @@ require([
     map.findLayerById(featurelayer_list["BEACH"]).visible = false;
     map.findLayerById(featurelayer_list["HEAT_DISORDER"]).visible = false;
     map.findLayerById(featurelayer_list["HEAT_STRESS"]).visible = false;
+    
+    map.findLayerById(featurelayer_list["HEAT_DISORDER"]).definitionExpression = "1 = 1";
+    map.findLayerById(featurelayer_list["HEAT_STRESS"]).definitionExpression = "1 = 1";
   }
 
   function setOpacity() {
