@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="ja" >
+<html lang="en" >
 
 <head>
 
@@ -37,6 +37,8 @@ body{
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow-x: scroll;
+  overflow-y: scroll;
 }
 #viewDiv {
   width: 65%;
@@ -49,7 +51,7 @@ body{
 .switch-field {
 	display: flex;
 	margin-bottom: 10px;
-	overflow: hidden;
+	/*overflow: hidden;*/
 }
 
 .switch-field input {
@@ -59,7 +61,7 @@ body{
 	width: 1px;
 	border: 0;
   display: none;
-	overflow: hidden;
+	/*verflow: hidden;*/
 }
 
 .switch-field label {
@@ -468,31 +470,36 @@ require([
     initLayer();
     setForm(true);
     setLayer();
+    view.extent = default_extend;
   })
 
   $('input[name="switch-shihyo"]').change(function() {
+    initLayer();
     setForm(false);
     setLayer();
+    view.extent = default_extend;
   })
 
   $('input[name="switch-rcp"]').change(function() {
     initLayer();
     setLayer();
+    zoomArea();
   })
 
   $('input[name="switch-model"]').change(function() {
     initLayer();
     setLayer();
+    zoomArea();
   })
 
   $('input[name="switch-kikan"]').change(function() {
     initLayer();
     setLayer();
+    zoomArea();
   })
 
   $('#prefectureselector').change(function() {
-    setLayer();
-    setMunicipalitieselector(true);
+    setMunicipalitieselector(false);
     zoomArea();
   })
 
@@ -558,7 +565,6 @@ require([
         url: left_layer_url,
         title: shihyo
       });
-      left_layer.effect = "opacity(100%)";
 
       map.add(left_layer);
       map.add(groupLayer);
@@ -575,8 +581,8 @@ require([
       });
 
       lgExpand.content = legend;
-      zoomArea();
     }  
+    setOpacity();
   }
 
   function setForm(flg){
@@ -792,8 +798,9 @@ require([
 
       }
       $('#prefectureselector').prop("selectedIndex", 0);
-
+      
       setMunicipalitieselector(true);
+ 
     });
 
     //名称選択肢生成
@@ -871,7 +878,7 @@ require([
         var area = features[i].attributes["市町村名リスト"];
         $('#municipalitieselector').append($('<option>').html(area).val(area));
       }
-	    
+      
       setLayer();
       zoomArea();
     });
@@ -1096,8 +1103,8 @@ require([
     map.findLayerById(featurelayer_list["HEAT_DISORDER"]).visible = false;
     map.findLayerById(featurelayer_list["HEAT_STRESS"]).visible = false;
     
-    map.findLayerById(featurelayer_list["HEAT_DISORDER"]).definitionExpression = "1 = 1";
-    map.findLayerById(featurelayer_list["HEAT_STRESS"]).definitionExpression = "1 = 1";
+    //map.findLayerById(featurelayer_list["HEAT_DISORDER"]).definitionExpression = "1 = 1";
+    //map.findLayerById(featurelayer_list["HEAT_STRESS"]).definitionExpression = "1 = 1";
   }
 
   function setOpacity() {
