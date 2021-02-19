@@ -815,7 +815,16 @@ require([
         "NAME"
       ];
       query.orderByFields = "CODE";
+      query.groupByFieldsForStatistics = "CODE";
 
+      query.outStatistics = [
+        {
+          statisticType: "min",
+          onStatisticField: "NAME",
+          outStatisticFieldName: "名称リスト"
+        }
+      ]
+      
       current_layer.queryFeatures(query)
         .then(function(response){
         var features = response.features;
@@ -824,7 +833,7 @@ require([
         $('#meishoselector').append($('<option>').html("全て").val("全て"));
 
         for(var i = 0; i< features.length; i++) {
-          var name = features[i].attributes["NAME"];
+          var name = features[i].attributes["名称リスト"];
           $('#meishoselector').append($('<option>').html(name).val(name));
 
         }
@@ -949,16 +958,26 @@ require([
         .then(function(response){
         var features = response.features;
 
-        var extent = null;
-
         for(var i = 0; i< features.length; i++) {
           var ken = features[i].attributes["KEN"];
 
-          extent = features[i].geometry.extent;
+          var extent = features[i].geometry.extent;
+
+          var xmin = extent.xmin; 
+          var xmax = extent.xmax; 
+          var ymin = extent.ymin; 
+          var ymax = extent.ymax; 
+
+          var extent = new Extent({
+            xmin: xmin,
+            xmax: xmax,
+            ymin: ymin,
+            ymax: ymax
+          });
 
           view.goTo(
             {
-              extent: extent.clone()
+              extent: extent.expand(1.2)
             },
             { duration: 100 }
           );
