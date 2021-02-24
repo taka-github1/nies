@@ -1,0 +1,765 @@
+
+
+<!DOCTYPE html>
+<html lang="ja" >
+
+<head>
+
+  <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+<meta name="apple-mobile-web-app-title" content="CodePen">
+
+<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+<link rel="mask-icon" type="" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+
+
+  <title>CodePen - Indonesia_matcro_v02</title>
+  
+  
+  
+  
+<style>
+html,
+body{
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  
+}
+
+#mainDiv {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+#headerDiv {
+  width: 40%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+}
+
+#viewDiv {
+  width: 60%;
+  height: 100%;
+  padding-bottom: 10px;
+}
+
+#mapviewDiv {
+  margin-bottom: 10px;
+}
+
+#mapDiv {
+  width: 95%;
+  height: 100%;
+  margin: 15px;
+}
+
+#tableDiv {
+  width: 95%;
+  font-size: 10pt; 
+  line-height:1;
+  overflow-y: auto;
+}
+
+#timeSliderDiv {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.body-active {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+}
+
+.body-nonactive {
+  display: none;
+}
+
+.switch-field {
+	display: flex;
+	margin-bottom: 10px;
+}
+
+.switch-field input {
+	position: absolute !important;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	width: 1px;
+	border: 0;
+}
+
+.switch-field label {
+	background-color: #e4e4e4;
+	color: rgba(0, 0, 0, 0.6);
+	font-size: 14px;
+	line-height: 1;
+	text-align: center;
+	padding: 5px 10px;
+	margin-right: -1px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+	transition: all 0.1s ease-in-out;
+}
+
+.switch-field label:hover {
+	cursor: pointer;
+}
+
+.switch-field input:checked + label {
+	background-color: #a5dc86;
+	box-shadow: none;
+}
+
+.switch-field label:first-of-type {
+	border-radius: 4px 0 0 4px;
+}
+
+.switch-field label:last-of-type {
+	border-radius: 0 4px 4px 0;
+}
+
+h2 {
+	font-size: 14px;
+	margin-bottom: 0px;
+}
+
+td {
+  min-width: 120px;
+	text-align: right;
+}
+</style>
+
+  
+  
+  
+  
+
+</head>
+
+<body translate="no" >
+  <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+          name="viewport"
+          content="initial-scale=1,maximum-scale=1,user-scalable=no"
+          />
+    <title>Matcro</title>
+
+    <link
+          rel="stylesheet"
+          href="https://js.arcgis.com/4.18/esri/themes/light/main.css"
+          />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://js.arcgis.com/4.18/"></script>
+  </head>
+
+  <body>
+    <div id="mainDiv">
+      <div id="headerDiv">
+        <h2>Type</h2>
+        <div class="switch-field">
+          <input type="radio" id="radio-YLD" name="switch-type" value="YLD" checked/>
+          <label for="radio-YLD">Yield</label>
+          <input type="radio" id="radio-PRD" name="switch-type" value="PRD"/>
+          <label for="radio-PRD">Production</label>
+        </div>
+        <h2>GCM</h2>
+        <div class="switch-field">
+          <input type="radio" id="radio-GFDL" name="switch-gcm" value="GFDL-ESM2M" checked/>
+          <label for="radio-GFDL">GFDL-ESM2M</label>
+          <input type="radio" id="radio-HadGEM2" name="switch-gcm" value="HadGEM2-ES" />
+          <label for="radio-HadGEM2">HadGEM2-ES</label>
+          <input type="radio" id="radio-IPSL" name="switch-gcm" value="IPSL-CM5A-LR" />
+          <label for="radio-IPSL">IPSL-CM5A-LR</label>
+          <input type="radio" id="radio-MIROC5" name="switch-gcm" value="MIROC5" />
+          <label for="radio-MIROC5">MIROC5</label>
+          <input type="radio" id="radio-Average" name="switch-gcm" value="Average" />
+          <label for="radio-Average">Average</label>
+        </div>
+        <h2>RCP</h2>
+        <div class="switch-field">
+          <input type="radio" id="radio-rcp26" name="switch-rcp" value="rcp26" checked/>
+          <label for="radio-rcp26">RCP 2.6</label>
+          <input type="radio" id="radio-rcp45" name="switch-rcp" value="rcp45" />
+          <label for="radio-rcp45">RCP 4.5</label>
+          <input type="radio" id="radio-rcp60" name="switch-rcp" value="rcp60" />
+          <label for="radio-rcp60">RCP 6.0</label>
+          <input type="radio" id="radio-rcp85" name="switch-rcp" value="rcp85"/>
+          <label for="radio-rcp85">RCP 8.5</label>
+        </div>
+        <h2>Adaptation action</h2>
+        <div class="switch-field">
+          <input type="radio" id="radio-None" name="switch-action" value="None" checked/>
+          <label for="radio-None">None</label>
+          <input type="radio" id="radio-FullIRR" name="switch-action" value="FullIRR" />
+          <label for="radio-FullIRR">Irrigation</label>
+          <input type="radio" id="radio-GMMSL" name="switch-action" value="GMMSL0.001" />
+          <label for="radio-GMMSL">Drought-tolerance</label>
+          <input type="radio" id="radio-Tc38" name="switch-action" value="Tc38" />
+          <label for="radio-Tc38">Heat-tolerance</label>
+          <input type="radio" id="radio-Nmax" name="switch-action" value="Nmax" />
+          <label for="radio-Nmax">Fertilizer</label>
+        </div>
+        <h2>Display</h2>
+        <div class="switch-field">
+          <input type="radio" id="radio-MAP" name="switch-display" value="MAP" checked/>
+          <label for="radio-MAP">Map</label>
+          <input type="radio" id="radio-TABLE" name="switch-display" value="TABLE"/>
+          <label for="radio-TABLE">Table</label>
+        </div>
+        <h2>Year</h2>
+        <div id="timeSliderDiv"></div>
+
+      </div>
+      <div id="viewDiv">
+        <div id="mapviewDiv" class="body-active">
+          <h2>Value</h2>
+          <div class="switch-field">
+            <input type="radio" id="radio-Normal" name="switch-value" value="Normal" checked/>
+            <label for="radio-Normal">Normal</label>
+            <input type="radio" id="radio-2010RATE" name="switch-value" value="2010RATE" />
+            <label for="radio-2010RATE">Change from 2010</label>
+            <input type="radio" id="radio-NoneRATE" name="switch-value" value="NoneRATE" />
+            <label for="radio-NoneRATE">Change from No adaptation</label>
+          </div>
+          <div id="mapDiv"></div>
+        </div>
+        <div id="tableDiv" class="body-nonactive">
+          <table
+                 id="table1" border="1" cellpadding="2">
+            <thead>
+              <tr bgcolor="#999999">
+                <th data-field="province_name" data-sortable="true">Province Name</th>
+                <th data-field="province_value" data-sortable="true">Value</th>
+                <th data-field="province_value" data-sortable="true">Change from 2010</th>
+                <th data-field="province_value" data-sortable="true">Change from No adaptation</th>
+                <th data-field="province_value" data-sortable="true">Vulenarability</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+  
+  
+      <script id="rendered-js" >
+var legend = null;
+var current_field = null;
+var left_layer = null;
+
+var values = {};
+var rates_2010 = {};
+var rates_none = {};
+
+var current_year = 2010;
+
+require([
+  "esri/Map",
+  "esri/WebMap",
+  "esri/views/MapView",
+  "esri/layers/FeatureLayer",
+  "esri/layers/GraphicsLayer",
+  "esri/Graphic",
+  "esri/tasks/QueryTask",
+  "esri/tasks/support/Query",
+  "esri/widgets/Home",
+  "esri/widgets/Legend",
+  "esri/widgets/Expand",
+  "esri/widgets/BasemapGallery",
+  "esri/widgets/TimeSlider",
+  "esri/geometry/Extent",
+  "esri/renderers/Renderer"
+], function (Map, WebMap, MapView, FeatureLayer, GraphicsLayer, Graphic, QueryTask,Query,
+              Home, Legend, Expand, BasemapGallery, TimeSlider, Extent, Renderer) {
+
+  var matcro_layer_url = "https://services6.arcgis.com/YweFsHK2qzfki4O5/arcgis/rest/services/indonesia_matcro_fs/FeatureServer/0";
+
+  var matcro_table_url = "https://services6.arcgis.com/YweFsHK2qzfki4O5/arcgis/rest/services/indonesia_matcro_fs/FeatureServer/1";
+
+  var provinces = null;
+
+  var default_extend = {
+    xmin: 92.1536,
+    ymin: -16.9833,
+    xmax: 143.8772,
+    ymax: 12.1575
+  }
+  var map = new Map({
+    basemap: "satellite"
+  });
+
+  var view = new MapView({
+    container: "mapDiv",
+    map: map,
+    zoom: 14
+  });
+
+  const matcro_layer = new FeatureLayer({
+    url: matcro_layer_url
+  });
+
+  var renderLayer = new GraphicsLayer();
+  renderLayer.opacity = 0.5;
+  renderLayer.title = "renderLayer";
+
+  var homeBtn = new Home({
+    view: view
+  });
+  view.ui.add(homeBtn, "top-left");
+
+  var basemapGallery = new BasemapGallery({
+    view: view,
+    container: document.createElement("div")
+  });
+
+  var bgExpand = new Expand({
+    view: view,
+    content: basemapGallery
+  });
+
+  basemapGallery.watch("activeBasemap", function () {
+    var mobileSize =
+        view.heightBreakpoint === "xsmall" ||
+        view.widthBreakpoint === "xsmall";
+
+    if (mobileSize) {
+      bgExpand.collapse();
+    }
+  });
+  view.ui.add(bgExpand, "top-right");
+
+  var lgExpand = new Expand({
+    view: view,
+    expanded: false,
+    mode : "floating"
+  });
+  view.ui.add(lgExpand, "bottom-right");
+
+  var legend = new Legend({
+    view: view,
+    respectLayerVisibility: true
+  });
+
+  //lgExpand.content = legend;
+
+  view.extent = default_extend;
+
+  let timeSlider = null;
+  view.when(function () {
+    timeSlider = new TimeSlider({
+      container: "timeSliderDiv",
+      view: view,
+      layout: "auto",
+      fullTimeExtent: {
+        start: new Date(2010, 0, 1),
+        end: new Date(2090, 0, 1)
+      },
+      playRate: 1000,
+      mode: "instant",
+      stops: {
+        interval: {
+          value: 10,
+          unit: "years"
+        }
+      },
+      labelFormatFunction: (value, type, element, layout) => {
+        switch (type) {
+          case "min":
+            break;
+          case "max":
+            break;
+          case "extent":
+            const start = timeSlider.fullTimeExtent.start;
+            const years = value[0].getFullYear();
+            element.setAttribute(`style`, `font-family: 'Orbitron', sans-serif; font-size: 22px;`);
+            element.innerText = `${years}`;
+            break;
+        }
+      },
+      tickConfigs: [{
+        mode: "position",
+        values: [
+          new Date(2010, 1, 1), new Date(2020, 1, 1), new Date(2030, 1, 1),
+          new Date(2040, 1, 1), new Date(2050, 1, 1), new Date(2060, 1, 1),
+          new Date(2070, 1, 1), new Date(2080, 1, 1), new Date(2090, 1, 1)
+        ].map((date) => date.getTime()),
+        labelsVisible: true,
+        labelFormatFunction: (value) => {
+          const date = new Date(value);
+          return `${date.getUTCFullYear()}`;
+        }
+      }]
+    });
+
+    timeSlider.watch("timeExtent", function(extent){
+      //renderLayer.removeAll();
+      map.layers.removeAll();
+
+      renderLayer.destroy();
+      renderLayer = new GraphicsLayer();
+      renderLayer.opacity = 0.8;
+      renderLayer.title = "renderLayer";
+
+      current_year = extent.start.getFullYear();
+      displayResults();
+      
+      map.add(matcro_layer);
+      map.add(renderLayer);
+    });
+
+    queryLayer();
+    map.add(renderLayer);
+  });
+
+
+  $('input[name="switch-type"]').change(function() {
+    queryLayer();
+  })
+
+  $('input[name="switch-gcm"]').change(function() {
+    queryLayer();
+  })
+
+  $('input[name="switch-rcp"]').change(function() {
+    queryLayer();
+  })
+
+  $('input[name="switch-action"]').change(function() {
+    queryLayer();
+  })
+
+  $('input[name="switch-display"]').change(function(e){
+    $('#mapviewDiv').toggleClass("body-active");
+    $('#mapviewDiv').toggleClass("body-nonactive");
+    $('#tableDiv').toggleClass("body-active");
+    $('#tableDiv').toggleClass("body-nonactive");
+  });
+
+  $('input[name="switch-value"]').change(function() {
+    queryLayer();
+  })
+
+  function queryLayer() {
+
+    timeSlider.stop();
+
+    var type = $('input[name=switch-type]:checked').val();
+    var gcm = $('input[name=switch-gcm]:checked').val();
+    var rcp = $('input[name=switch-rcp]:checked').val();
+    var action = $('input[name=switch-action]:checked').val();
+    var value = $('input[name=switch-value]:checked').val();
+
+
+    var definition = "SHIHYO = '" + type + "'" + 
+        " AND GCMs = '" + gcm  + "'" + 
+        " AND RCP = '" + rcp  + "'" + 
+        " AND ACTION = '" + action  + "'";
+
+    var field_head = "Value_";
+    if (value == "2010RATE") { 
+      field_head = "Change2010_";
+    } else if (value == "NoneRATE"){
+      field_head = "Change_None_";
+    }
+
+    var matcro_table = new FeatureLayer({
+      url: matcro_table_url
+    });
+
+    var query = matcro_table.createQuery();
+    query.where = definition;
+    query.outFields = ["*"];
+
+    matcro_table.queryFeatures(query)
+      .then(function(response){
+      var features = response.features;
+
+      values = {};
+      rates_2010 = {};
+      rates_none = {};
+
+      for(var i = 0; i< features.length; i++) {
+
+        var province = features[i].attributes["PROVINCE"];
+        values[province] = {};
+        rates_2010[province] = {};
+        rates_none[province] = {};
+
+        for (let year = 2010; year <= 2090; year=year+10) {
+          values[province][year] = features[i].attributes["Value_" + String(year)];
+          rates_2010[province][year] = features[i].attributes["Change2010_" + String(year)];
+          rates_none[province][year] = features[i].attributes["Change_None_" + String(year)];
+        }
+      }
+
+      query = matcro_layer.createQuery();
+      query.returnGeometry = true;
+      query.outFields = ["*"];
+      query.where = "1=1";
+      query.maxAllowableOffset = 0.001;
+      matcro_layer.queryFeatures(query).then(function(results){
+        provinces = results;
+        displayResults();
+      });
+    });
+  }
+
+  function displayResults() {
+
+    var type = $('input[name=switch-type]:checked').val();
+    var value = $('input[name=switch-value]:checked').val();
+
+    var field_head = "Value_";
+    if (value == "2010RATE") { 
+      field_head = "Change2010_";
+    } else if (value == "NoneRATE"){
+      field_head = "Change_None_";
+    }
+
+    if (provinces == null) {
+      return;
+    }
+
+    renderLayer.removeAll();
+
+    var features = provinces.features.map(function (graphic) {
+
+      var attribuutes = graphic.attributes;
+
+      var set_attributes = {};
+
+      set_attributes["province_name"] = attribuutes.province_name;
+      set_attributes["province_ja"] = attribuutes.province_ja;
+      set_attributes["match_province"] = attribuutes.match_province;
+      set_attributes["Vulenarability"] = attribuutes.Vulenarability;
+      
+      var year_values = values[attribuutes.match_province];
+      var year_rates_2010 = rates_2010[attribuutes.match_province];
+      var year_rates_none = rates_none[attribuutes.match_province];
+
+      for (let year_value in year_values) {
+        set_attributes["Value_" + String(year_value)] = year_values[year_value];
+        set_attributes["Change2010_" + String(year_value)] = year_rates_2010[year_value];
+        set_attributes["Change_None_" + String(year_value)] = year_rates_none[year_value];
+      }
+
+      graphic.attributes = set_attributes;
+
+      if (value == "Normal") {
+        graphic.symbol = create_symbol(type, value, year_values[current_year]);
+      } else if (value == "2010RATE") {
+        graphic.symbol = create_symbol(type, value, year_rates_2010[current_year]);
+      } else {
+        graphic.symbol = create_symbol(type, value, year_rates_none[current_year]);
+      }
+
+      graphic.opacity = 0.5;
+      graphic.popupTemplate = {
+        title: "{province_name}",
+        outFields: ["*"],
+        content: [{
+          type: "fields",
+          fieldInfos: [{
+            fieldName: "province_name",
+            label: "province_name"
+          }, {
+            fieldName: "province_ja",
+            label: "province_ja"
+          }, {
+            fieldName: "Value_" + String(current_year),
+            label: String(current_year) + " year value",
+            format: {
+              digitSeparator: true,
+              places: 2
+            }
+          }, {
+            fieldName: "Change2010_" + String(current_year),
+            label: String(current_year) + " Change from 2010",
+            format: {
+              digitSeparator: true,
+              places: 0
+            }
+          }, {
+            fieldName: "Change_None_" + String(current_year),
+            label: String(current_year) + " Change from No Adaptation",
+            format: {
+              digitSeparator: true,
+              places: 0
+            }
+          }, {
+            fieldName: "Vulenarability",
+            label: "Vulenarability",
+            format: {
+              digitSeparator: true,
+              places: 4
+            }
+          }]
+        }]
+      };
+
+      return graphic;
+    });
+
+    renderLayer.addMany(features);
+
+    tableUpdate();
+  }
+
+  function tableUpdate() {
+
+    var type = $('input[name=switch-type]:checked').val();
+    var value = $('input[name=switch-value]:checked').val();
+
+    var field_head = "Value_";
+    if (value == "2010RATE") { 
+      field_head = "Change2010_";
+    } else if (value == "NoneRATE"){
+      field_head = "Change_None_";
+    }
+
+    var table = $('#table1');
+    table.find('tbody tr').remove();
+
+    for (var province of provinces.features) {
+      var att = province.attributes;
+      var year_data = att["Value_" + String(current_year)];
+      var year_data_symbol = create_symbol(type, "Normal", year_data);
+      
+      var rate_2010 = att["Change2010_" + String(current_year)];
+      var rate_2010_symbol = create_symbol(type, "2010RATE", rate_2010);
+      
+      var rate_none = att["Change_None_" + String(current_year)];
+      var rate_none_symbol = create_symbol(type, "NoneRATE", rate_none);
+      
+      var vulenarability = att["Vulenarability"];
+      table.append("<tr><td>" + att["province_name"] + "</td>" + 
+                   "<td bgcolor=\"" + year_data_symbol.color + "\">" + set_comma(year_data.toFixed(2)) + "</td>" + 
+                   "<td bgcolor=\"" + rate_2010_symbol.color + "\">" + rate_2010 + "%</td>" + 
+                   "<td bgcolor=\"" + rate_none_symbol.color + "\">" + rate_none + "%</td>" +
+                   "<td>" + vulenarability.toFixed(4) + "</td></tr>");
+    }
+  }
+
+  function set_comma(str_num) {
+    return str_num.replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+  }
+
+  
+  function create_symbol(type, value, data) {
+
+    var symbol = null;
+
+    const symbol1 = {
+      type: "simple-fill",
+      color: "#FBE9BD",
+      style: "solid",
+      outline: {
+        width: 0.2,
+        color: [255, 255, 255, 1]
+      }
+    };
+
+    const symbol2 = {
+      type: "simple-fill",
+      color: "#EEB177",
+      style: "solid",
+      outline: {
+        width: 0.2,
+        color: [255, 255, 255, 1]
+      }
+    };
+
+    const symbol3 = {
+      type: "simple-fill",
+      color: "#E58B48",
+      style: "solid",
+      outline: {
+        width: 0.2,
+        color: [255, 255, 255, 1]
+      }
+    };
+
+    const symbol4 = {
+      type: "simple-fill", 
+      color: "#C35D30",
+      style: "solid",
+      outline: {
+        width: 0.2,
+        color: [255, 255, 255, 1]
+      }
+    };
+
+    const symbol5 = {
+      type: "simple-fill", 
+      color: "#A12F19",
+      style: "solid",
+      outline: {
+        width: 0.2,
+        color: [255, 255, 255, 1]
+      }
+    };
+
+    if (type == "YLD" && value == "Normal"){
+
+      if (data <= 4000) {
+        symbol = symbol1;
+      } else if (data <= 5000) {
+        symbol = symbol2;
+      } else if (data <= 6000) {
+        symbol = symbol3;
+      } else if (data <= 7000) {
+        symbol = symbol4;
+      } else {
+        symbol = symbol5;
+      }
+    } else if (type == "PRD" && value == "Normal"){
+      if (data <= 5000000) {
+        symbol = symbol1;
+      } else if (data <= 10000000) {
+        symbol = symbol2;
+      } else if (data <= 15000000) {
+        symbol = symbol3;
+      } else if (data <= 20000000) {
+        symbol = symbol4;
+      } else {
+        symbol = symbol5;
+      }
+
+    } else {
+      if (data <= -10) {
+        symbol = symbol1;
+      } else if (data <= -5) {
+        symbol = symbol2;
+      } else if (data <= 0) {
+        symbol = symbol3;
+      } else if (data <= 5) {
+        symbol = symbol4;
+      } else {
+        symbol = symbol5;
+      }
+    }
+
+    return symbol;
+
+  }
+});
+    </script>
+
+  
+
+</body>
+
+</html>
+ 
