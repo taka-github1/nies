@@ -253,21 +253,22 @@ require([
 
     table.queryFeatures(query)
       .then(function(response){ 
+      bunya = $('input[name=switch-bunya]:checked').val();
+      shihyo = $('input[name=switch-shihyo]:checked').val();
+
       var features = response.features;
       var recordes = [];
       for(var i = 0; i< features.length; i++) {
         var rcp = features[i].attributes["RCP"];
         var gcm = features[i].attributes["GCM"];
-        /*
-        var rbaseyear = features[i].attributes["RBASEYEAR"];
-        var r2031_2050 = features[i].attributes["R2031_2050"];
-        var r2081_2100 = features[i].attributes["R2081_2100"];
-        */
-        var rbaseyear = Math.round(features[i].attributes["RBASEYEAR"] * 100) / 100;
-        var r2031_2050 = Math.round(features[i].attributes["R2031_2050"] * 100) / 100;
-        var r2081_2100 = Math.round(features[i].attributes["R2081_2100"] * 100) / 100;
-        
-        var bunya = $('input[name=switch-bunya]:checked').val();
+
+        var round = 100;
+        if (bunya == "SHIZENSEITAI" || shihyo == "Beach" || shihyo == "HealthEAAD") {
+          round = 10;
+        }
+        var rbaseyear = Math.round(features[i].attributes["RBASEYEAR"] * round) / round;
+        var r2031_2050 = Math.round(features[i].attributes["R2031_2050"] * round) / round;
+        var r2081_2100 = Math.round(features[i].attributes["R2081_2100"] * round) / round;
 
         if (bunya == "SHIZENSEITAI") {
           recordes[rcp + " " + gcm] = [rbaseyear, r2081_2100];
