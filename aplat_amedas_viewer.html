@@ -690,17 +690,26 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     }
 
     //グラフ作成
+    var field = shihyo;
     let query = shihyoLayer.createQuery();
     query.outFields = [
-      "年", shihyo
+      "年", field
     ];
     query.orderByFields = "年";
     query.groupByFieldsForStatistics = "年";
-
+    
+    var sType = "avg";
+    var sLabel = "平均";
+    
+    if (shihyo == "1時間降水量30mm以上の年間発生回数" || shihyo == "1時間降水量50mm以上の年間発生回数") {
+      sType = "sum";
+      sLabel = "合計";
+    }
+    
     query.outStatistics = [
       {
         statisticType: "avg",
-        onStatisticField: shihyo,
+        onStatisticField: field,
         outStatisticFieldName: "value"
       }  
     ];
@@ -708,7 +717,7 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     
     var chat_title = shihyotxt + " ";
     
-    var expression = shihyo + " <> " + String(32767);
+    var expression = field + " <> " + String(32767);
     if (bunrui == "月別値") { 
       chat_title = chat_title + monthtxt + " ";
       expression = expression + " AND 月 = " + month;
@@ -719,10 +728,10 @@ var portalUrl =  "https://nies.maps.arcgis.com";
       chat_title = chat_title + observatory + "観測所";
     } else if (prefecture != "全国") {
       query.where = expression + " AND 都道府県 = '" + prefecture + "'";
-      chat_title = chat_title + prefecture + "平均";
+      chat_title = chat_title + prefecture + sLabel;
     } else {
       query.where = expression;
-      chat_title = chat_title + "全国平均";
+      chat_title = chat_title + "全国" + sLabel;
     }
     
     shihyoLayer.queryFeatures(query)
@@ -910,10 +919,13 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     
     var query = shihyoLayer.createQuery();
 
+    /*
     var expression = "年 = " + year;
     if (bunrui == "月別値") {
       expression = "年 = " + year + " AND 月 = " + month;
     }
+    */
+    var expression = "1 =1";
     
     if (flg == 0) {
       if (observatory != "全て"){
