@@ -684,13 +684,13 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     var monthtxt = $('#monthselector option:selected').text();
 
     //1時間で始まる指標には先頭にFをつける
+    var field = shihyo;
     var regex = new RegExp(/^1.*$/);
     if (regex.test(shihyo)) {
-      shihyo = "F" + shihyo;
+      field = "F" + shihyo;
     }
 
     //グラフ作成
-    var field = shihyo;
     let query = shihyoLayer.createQuery();
     query.outFields = [
       "年", field
