@@ -1020,7 +1020,9 @@ require([
 
       var query = shichosonkai.createQuery();
 
-      if (municipalitie != "全て"){
+      if (prefecture != "全国" && municipalitie != "全て") {
+        query.where = "KEN = '" + prefecture + "' AND SIKUCHOSON = '" + municipalitie + "'";
+      } else if (municipalitie != "全て"){
         query.where = "SIKUCHOSON = '" + municipalitie + "'";
       } else if (prefecture != "全国") {
         query.where = "KEN = '" + prefecture + "'";
