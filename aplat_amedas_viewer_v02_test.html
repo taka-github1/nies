@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="ja" >
+<html lang="en" >
 
 <head>
 
@@ -357,7 +357,8 @@ require([
 
   //イベント処理
   $('#kanshoselector').change(function() {
-    setForm(true);
+    setForm(false);
+    setObservatoryselector();
     setFilter(true);
     draw_charts();
   })
@@ -471,7 +472,7 @@ require([
         continue;
       }
 
-      if (layers[i].title == (kansho + "_" + shihyo)) {
+      if (layers[i].title == (kansho + " " + shihyo)) {
         shihyoLayer = layers[i];
 
         shihyoLayer.popupTemplate.actions = [{
