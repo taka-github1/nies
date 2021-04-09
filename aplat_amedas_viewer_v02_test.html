@@ -307,6 +307,11 @@ var portalUrl =  "https://nies.maps.arcgis.com";
 
   var basemapGallery = new BasemapGallery({
     view: view,
+    source: {
+      query: {
+        id: '0a489e5adeab43e1be2d570ea3149af3'
+      }
+    },
     container: document.createElement("div")
   });
 
