@@ -710,6 +710,13 @@ require([
     } else if (bunya == "MIZUKANKYO") {
       query.where = "shurui = 'Chlorophyll'";
       $("#area-label").html("対象エリア（ダム）");
+      
+      //対象エリア（ダム）を初期化しない
+      if (befor_shihyo == "Chlorophyll_max" || befor_shihyo == "Chlorophyll_avg") {
+        befor_shihyo = shihyo;
+        draw_charts();
+        return;
+      }
     } else {
       query.where = "shurui = 'Prefecture'";
       $("#area-label").html("対象エリア（都道府県）");
