@@ -277,7 +277,6 @@ var portalUrl =  "https://nies.maps.arcgis.com";
   map = new WebMap({
     portalItem: {
       id: "2f49ed4927674da99fc4b6dde18039e2"
-      //id: "36577137f2a54bed8c9cdd9f26b7285e"
     }
   });
 
@@ -288,13 +287,6 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     constraints: {
       minScale : 50000000,
       maxScale : 5000
-    }
-  });
-  
-  const prefectures = new FeatureLayer({
-    portalItem: {
-      
-      id: "bf1517e6867c416d817a46d0b444dc5f"
     }
   });
 
@@ -462,8 +454,8 @@ var portalUrl =  "https://nies.maps.arcgis.com";
         $('#shihyoselector').append($('<option>').html("日降水量の年最大値(mm)").val("日降水量の年最大値"));
         $('#shihyoselector').append($('<option>').html("日降水量100mm以上の年間日数(日)").val("日降水量100mm以上の年間日数"));
         $('#shihyoselector').append($('<option>').html("日降水量200mm以上の年間日数(日)").val("日降水量200mm以上の年間日数"));
-        $('#shihyoselector').append($('<option>').html("1時間降水量30mm以上の年間発生回数(回)").val("1時間降水量30mm以上の年間発生回数"));
-        $('#shihyoselector').append($('<option>').html("1時間降水量50mm以上の年間発生回数(回)").val("1時間降水量50mm以上の年間発生回数"));
+        //$('#shihyoselector').append($('<option>').html("1時間降水量30mm以上の年間発生回数(回)").val("1時間降水量30mm以上の年間発生回数"));
+        //$('#shihyoselector').append($('<option>').html("1時間降水量50mm以上の年間発生回数(回)").val("1時間降水量50mm以上の年間発生回数"));
         $('#shihyoselector').append($('<option>').html("無降水日年間日数(日)").val("無降水日年間日数"));
         $('#shihyoselector').append($('<option>').html("年最大積雪深(cm)").val("年最大積雪深"));
         $('#shihyoselector').append($('<option>').html("日降雪量の年最大値(cm)").val("日降雪量の年最大値"));
@@ -500,17 +492,6 @@ var portalUrl =  "https://nies.maps.arcgis.com";
         }];
 
         legend.layerInfos.layer = shihyoLayer;
-
-        //凡例のDOM要素を取得
-        var legend_doms = $('.esri-legend__layer-cell--info');
-        
-        for (var index = 0; index < legend_doms.length; index++){
-          var dom = legend_doms[index];
-          if (dom.innerText == "その他"){
-            dom.innerText = "観測データなし";
-          }
-          
-        }
         
         layers[i].visible = true;
       } else {
