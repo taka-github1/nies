@@ -733,12 +733,6 @@ require([
     
     var kansho =  $('#kanshoselector').val();
     
-    if (observatory != "全て"){
-      $('#chartDiv').removeClass('hidden');
-    } else {
-      $('#chartDiv').addClass('hidden');
-    }
-
     //1時間で始まる指標には先頭にFをつける
     var field = shihyo;
     var regex = new RegExp(/^1.*$/);
@@ -804,6 +798,12 @@ require([
       }
 
       update_chart(chat_title, labels, datas);
+      
+      if (observatory != "全て"){
+        $('#chartDiv').removeClass('hidden');
+      } else {
+        $('#chartDiv').addClass('hidden');
+      }
     });
   }
 
