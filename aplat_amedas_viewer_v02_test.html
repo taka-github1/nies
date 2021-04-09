@@ -243,6 +243,9 @@ var default_extend = {
 
 
 require([
+  "esri/portal/Portal",
+  "esri/identity/OAuthInfo",
+  "esri/identity/IdentityManager",
   "esri/Map",
   "esri/WebMap",
   "esri/Basemap",
@@ -259,11 +262,21 @@ require([
   "esri/geometry/Extent",
   "esri/renderers/Renderer",
   "esri/widgets/BasemapGallery/support/LocalBasemapsSource"
-], function (Map, WebMap, Basemap, MapView, TileLayer, FeatureLayer, GraphicsLayer, 
+], function (Portal, OAuthInfo, identityManager, Map, WebMap, Basemap, MapView, TileLayer, FeatureLayer, GraphicsLayer, 
               Home, Swipe, Legend, Expand, BasemapGallery, Slider, Extent, Renderer, LocalBasemapsSource) {
+var portalUrl =  "https://nies.maps.arcgis.com";
+
+  var info = new OAuthInfo({
+    appId: "QUUUOLXshMCe9OSp",
+    popup: false
+  });
+
+  identityManager.registerOAuthInfos([info]);
+  identityManager.getCredential(portalUrl);
+  
   map = new WebMap({
     portalItem: {
-      id: "f27a14926fa84a35be4308b4e2e54786"
+      id: "2f49ed4927674da99fc4b6dde18039e2"
       //id: "36577137f2a54bed8c9cdd9f26b7285e"
     }
   });
