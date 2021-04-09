@@ -186,7 +186,7 @@ h2 {
         <input type="radio" id="radio-HEAT_STRESS" name="switch-shihyo" value="HEAT_STRESS" hidden/>
         <label for="radio-HEAT_STRESS">熱ストレス超過死亡者数</label>
       </div>
-      <h2>対象エリア</h2>
+      <h2 id="area-label">対象エリア</h2>
       <div class="button dropdown"> 
         <select id="areaselector">
           <option value="全国">全国</option>
@@ -704,11 +704,23 @@ require([
 
     if (shihyo == "Beach") {
       query.where = "shurui = 'Beach'";
+      $("#area-label").html("対象エリア（砂浜）");
     } else if (bunya == "MIZUKANKYO") {
       query.where = "shurui = 'Chlorophyll'";
+      $("#area-label").html("対象エリア（ダム）");
     } else {
       query.where = "shurui = 'Prefecture'";
+      $("#area-label").html("対象エリア（都道府県）");
+	    
+      //対象エリア（都道府県）を初期化しない
+      if (befor_shihyo != "Beach" && befor_shihyo != "Chlorophyll_max" && befor_shihyo != "Chlorophyll_avg" && befor_shihyo != "") {
+        befor_shihyo = shihyo;
+        draw_charts();
+        return;
+      }
     }
+    befor_shihyo = shihyo;
+    
     query.outFields = [
       "shurui ", "code", "name" 
     ];
