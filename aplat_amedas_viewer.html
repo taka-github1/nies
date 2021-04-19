@@ -6,7 +6,6 @@
 <head>
 
   <meta charset="UTF-8">
-  
 
   <title>amedas_viewer</title>
   
@@ -38,7 +37,7 @@ body{
   width: 70%;
   display: flex;
   flex-direction: row;
-  overflow: hidden;
+  /*overflow: hidden;*/
   margin-bottom: 10px;
 }
 
@@ -58,7 +57,7 @@ p4 {
   min-height:20px;
   font-size: 16px;
   align-items:center;
-  overflow:hidden;
+  /*overflow: hidden;*/
   white-space:nowrap;
 }
 
@@ -71,12 +70,16 @@ p4 {
   height: 50px;
 }
 
+#chartDiv {
+  height: 50%;
+  flex-direction: column;
+}
 
 #graphDiv {
-  height: 50%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 .chart-panel {
@@ -126,7 +129,7 @@ p4 {
           name="viewport"
           content="initial-scale=1,maximum-scale=1,user-scalable=no"
           />
-    <title>S8</title>
+    <title>アメダス</title>
 
     <link
           rel="stylesheet"
@@ -141,6 +144,14 @@ p4 {
   <body>
     <div id="mainDiv">
       <div id="headerDiv">
+        <h2>官署選択</h2>
+        <div class="dropdown"> 
+          <p4>官署</p4>
+          <select id="kanshoselector">
+            <option value="アメダス">アメダス</option>
+            <option value="気象官署">気象官署</option>
+          </select><br/>
+        </div>
         <h2>指標</h2>
         <div class="dropdown"> 
           <select id="bunruiselector">
@@ -183,17 +194,19 @@ p4 {
             <option value="全て">全て</option>
           </select>
         </div>
-        <h2>グラフ</h2>
-        <div id="graphDiv">
-          <div class="chart-panel">
-            <canvas id="chartCanvas"/>
-          </div>
-        </div>
         <h2>CSVダウンロード</h2>
         <div class="download">
           <button class="button" id="csv_observatory">選択した観測所</button>
           <button class="button" id="csv_maparea">マップ範囲のみ</button>
           <a id="download_link" href="#" download="test.txt" style="display: none">ダウンロード</a>
+        </div>
+        <div id="chartDiv" class="hidden"> 
+          <h2>グラフ</h2>
+          <div id="graphDiv">
+            <div class="chart-panel">
+              <canvas id="chartCanvas"/>
+            </div>
+          </div>
         </div>
       </div>
       <div id="viewDiv"></div>
@@ -212,10 +225,10 @@ var graphicsLayer = null;
 var chart = null;
 
 var default_extend = {
-  xmin: 126.2331,
-  ymin: 31.367,
-  xmax: 151.5675,
-  ymax: 44.3821
+  xmin: 115.2349,
+  ymin: 18.6611,
+  xmax: 161.6851,
+  ymax: 46.8108
 }
 
 
@@ -225,6 +238,7 @@ require([
   "esri/identity/IdentityManager",
   "esri/Map",
   "esri/WebMap",
+  "esri/Basemap",
   "esri/views/MapView",
   "esri/layers/TileLayer",
   "esri/layers/FeatureLayer",
@@ -236,9 +250,10 @@ require([
   "esri/widgets/BasemapGallery",
   "esri/widgets/Slider",
   "esri/geometry/Extent",
-  "esri/renderers/Renderer"
-], function (Portal, OAuthInfo, identityManager, Map, WebMap, MapView, TileLayer, FeatureLayer, GraphicsLayer, 
-              Home, Swipe, Legend, Expand, BasemapGallery, Slider, Extent, Renderer) {
+  "esri/renderers/Renderer",
+  "esri/widgets/BasemapGallery/support/LocalBasemapsSource"
+], function (Portal, OAuthInfo, identityManager, Map, WebMap, Basemap, MapView, TileLayer, FeatureLayer, GraphicsLayer, 
+              Home, Swipe, Legend, Expand, BasemapGallery, Slider, Extent, Renderer, LocalBasemapsSource) {
 var portalUrl =  "https://nies.maps.arcgis.com";
 
   var info = new OAuthInfo({
@@ -248,10 +263,10 @@ var portalUrl =  "https://nies.maps.arcgis.com";
 
   identityManager.registerOAuthInfos([info]);
   identityManager.getCredential(portalUrl);
-
+  
   map = new WebMap({
     portalItem: {
-      id: "46870ee575724d6caf0d66ba661f7ebb"
+      id: "ce2dd3b7d9064d3f81eaa38621fe8e9d"
     }
   });
 
@@ -341,6 +356,13 @@ var portalUrl =  "https://nies.maps.arcgis.com";
 
 
   //イベント処理
+  $('#kanshoselector').change(function() {
+    setForm(false);
+    setObservatoryselector();
+    setFilter(true);
+    draw_charts();
+  })
+  
   $('#bunruiselector').change(function() {
     setForm(true);
     setFilter(true);
@@ -356,7 +378,7 @@ var portalUrl =  "https://nies.maps.arcgis.com";
   $('#monthshihyoselector').change(function() {
     setFilter(true);
   })
-
+  
   $('#prefectureselector').change(function() {
     setObservatoryselector();
     setForm(false);
@@ -376,21 +398,21 @@ var portalUrl =  "https://nies.maps.arcgis.com";
   yearSlider.on("thumb-drag", function(event) {
     setFilter(false);
   });
-  
+
   $('#monthselector').change(function() {
     setForm(false);
     setFilter(false);
     draw_charts();
   })
-  
+
   $('#csv_observatory').click(function() {
     download_csv(0);
   })
-    
+
   $('#csv_maparea').click(function() {
     download_csv(1);
   })
-  
+
 
   function setForm(init_flg){
     var bunrui = $('#bunruiselector').val();
@@ -402,6 +424,8 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     } else {
       $('#monthselectorDiv').removeClass('hidden');
     }
+    
+    var kansho = $('#kanshoselector').val();
 
     if (init_flg) {
       $('#shihyoselector > option').remove();
@@ -426,7 +450,7 @@ var portalUrl =  "https://nies.maps.arcgis.com";
         $('#shihyoselector').append($('<option>').html("年最大積雪深(cm)").val("年最大積雪深"));
         $('#shihyoselector').append($('<option>').html("日降雪量の年最大値(cm)").val("日降雪量の年最大値"));
 
-        
+
       } else {
         $('#shihyoselector').append($('<option>').html("月平均気温(℃)").val("月平均気温"));
         $('#shihyoselector').append($('<option>').html("日最高気温の月平均(℃)").val("日最高気温の月平均"));
@@ -434,13 +458,13 @@ var portalUrl =  "https://nies.maps.arcgis.com";
         $('#shihyoselector').append($('<option>').html("月降水量(mm)").val("月降水量"));
         $('#shihyoselector').append($('<option>').html("月最大積雪深(cm)").val("月最大積雪深"));
       }
-      
+
       if (init_flg) {
         $('#shihyoselector').prop("selectedIndex", 0);
         shihyo = $('#shihyoselector').val();
       }
     }
-    
+
     //レイヤーの初期化
     var layers = map.allLayers.items;
     for(let i = 0; i < layers.length; i++) {
@@ -448,42 +472,44 @@ var portalUrl =  "https://nies.maps.arcgis.com";
         continue;
       }
 
-      if (layers[i].title == shihyo) {
+      if (layers[i].title == (shihyo)) {
         shihyoLayer = layers[i];
-        
+
         shihyoLayer.popupTemplate.actions = [{
           title: "ｸﾞﾗﾌ表示",
           id: "change-chart",
           image: "https://illustration-free.net/thumb/svg/ifn0397.svg"
         }];
-        
-        legend.layerInfos.layer = shihyoLayer;
 
+        legend.layerInfos.layer = shihyoLayer;
+        
         layers[i].visible = true;
       } else {
         layers[i].visible = false;
       }
     }
-    
-    
+
+
     var prefecture = $('#prefectureselector').val();
     var observatory =  $('#observatoryselector').val();
+    
+    var kansho =  $('#kanshoselector').val();
 
     let query = shihyoLayer.createQuery();
 
-    var expression = "";
+    var expression = "官署 = '" + kansho + "'";
     if (bunrui == "月別値") { 
-      expression = " AND 月 = " + month;
+      expression = expression + " AND 月 = " + month;
     }
-    
+
     if (observatory != "全て"){
-      query.where = " 観測地点名 = '" + observatory + "'" + expression;
+      query.where = expression +" AND 観測地点名 = '" + observatory + "'";
     } else if (prefecture != "全国") {
-      query.where = " 都道府県 = '" + prefecture + "'" + expression;
+      query.where = expression +" AND 都道府県 = '" + prefecture + "'";
     } else {
-      query.where = " 1=1" + expression;
+      query.where = expression;
     }
-    
+
     query.outFields = [
       "年"
     ];
@@ -504,27 +530,27 @@ var portalUrl =  "https://nies.maps.arcgis.com";
 
     shihyoLayer.queryFeatures(query)
       .then(function(response){
-      
+
       var features = response.features;
       var min_year = features[0].attributes["最小年"];
       var max_year = features[0].attributes["最大年"];
-      
+
       yearSlider.min = min_year;
       yearSlider.max = max_year;
-      
+
     });
-    
+
     if (!init_flg) {
       return;
     }
-    
+
     query = shihyoLayer.createQuery();
 
-    var expression = "1 = 1";
+    var expression = "官署 = '" + kansho + "'";
     if (bunrui == "月別値") { 
-      expression = "月 = " + month;
+      expression = expression + " AND 月 = " + month;
     }
-    
+
     query.where = expression;
     query.outFields = [
       "都道府県"
@@ -560,7 +586,7 @@ var portalUrl =  "https://nies.maps.arcgis.com";
       }
       $('#prefectureselector').prop("selectedIndex", 0);
       setObservatoryselector(init_flg);
-      
+
     });
   }
 
@@ -570,13 +596,15 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     var bunrui = $('#bunruiselector').val();
     var month =  $('#monthselector').val();
     
+    var kansho =  $('#kanshoselector').val();
+
     let query = shihyoLayer.createQuery();
 
-    var expression = "1 = 1";
+    var expression = "官署 = '" + kansho + "'";
     if (bunrui == "月別値") { 
-      expression = "月 = " + month;
+      expression = expression + " AND 月 = " + month;
     }
-    
+
     if (prefecture == "全国") {
       query.where = expression;
     } else {
@@ -629,15 +657,18 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     var observatory =  $('#observatoryselector').val();
     var year = yearSlider.values[0];
     var month =  $('#monthselector').val();
+    var kansho =  $('#kanshoselector').val();
 
     shihyoLayer.definitionExpression = "";
+
+    var expression = "官署 = '" + kansho + "'";
     
-    var expression = "年 = " + String(year);
-    
+    expression = expression + " AND 年 = " + String(year);
+
     if (bunrui == "月別値") { 
       expression = expression + " AND 月 = " + month;
     }
-    
+
     if (prefecture != "全国" && observatory != "全て"){
       shihyoLayer.definitionExpression = expression + " AND 都道府県 = '" + prefecture + "' AND 観測地点名 = '" + observatory + "'";
 
@@ -646,7 +677,7 @@ var portalUrl =  "https://nies.maps.arcgis.com";
       }
     } else if (observatory != "全て"){
       shihyoLayer.definitionExpression = expression + " AND 観測地点名 = '" + observatory + "'";
-      
+
       if (zoom_flg){
         zoomToLayer();
       }
@@ -674,21 +705,23 @@ var portalUrl =  "https://nies.maps.arcgis.com";
       });
     }
   }
-  
+
   function draw_charts(observatory) {
 
     var bunrui = $('#bunruiselector').val();
     var shihyo = $('#shihyoselector').val();
     var shihyotxt = $('#shihyoselector option:selected').text();
     var prefecture = $('#prefectureselector').val();
-    
+
     if (observatory == undefined) {
       observatory =  $('#observatoryselector').val();
     }
-    
+
     var month =  $('#monthselector').val();
     var monthtxt = $('#monthselector option:selected').text();
-
+    
+    var kansho =  $('#kanshoselector').val();
+    
     //1時間で始まる指標には先頭にFをつける
     var field = shihyo;
     var regex = new RegExp(/^1.*$/);
@@ -703,7 +736,7 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     ];
     query.orderByFields = "年";
     query.groupByFieldsForStatistics = "年";
-    
+
     var sType = "avg";
     var sLabel = "平均";
     
@@ -720,10 +753,10 @@ var portalUrl =  "https://nies.maps.arcgis.com";
       }  
     ];
     query.returnGeometry = false;
-    
+
     var chat_title = shihyotxt + " ";
-    
-    var expression = field + " <> " + String(32767);
+
+    var expression = "官署 = '" + kansho + "' AND " + field + " <> " + String(32767);
     if (bunrui == "月別値") { 
       chat_title = chat_title + monthtxt + " ";
       expression = expression + " AND 月 = " + month;
@@ -739,7 +772,7 @@ var portalUrl =  "https://nies.maps.arcgis.com";
       query.where = expression;
       chat_title = chat_title + "全国" + sLabel;
     }
-    
+
     shihyoLayer.queryFeatures(query)
       .then(function(response){ 
       var features = response.features;
@@ -748,12 +781,18 @@ var portalUrl =  "https://nies.maps.arcgis.com";
       for(var i = 0; i< features.length; i++) {
         var year = features[i].attributes["年"];
         var value = features[i].attributes["value"];
-        
+
         labels.push(year);
         datas.push(Math.round(value * 100) / 100);
       }
-      
+
       update_chart(chat_title, labels, datas);
+      
+      if (observatory != "全て"){
+        $('#chartDiv').removeClass('hidden');
+      } else {
+        $('#chartDiv').addClass('hidden');
+      }
     });
   }
 
@@ -783,7 +822,7 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     });
 
     var yLabel = "";
-    
+
     if (shihyo == "年平均気温") { 
       yLabel = "年平均気温(℃)";
     } else if (shihyo == "日最高気温の年平均  ") { 
@@ -896,19 +935,21 @@ var portalUrl =  "https://nies.maps.arcgis.com";
       }
     });
   }
-  
+
 
   function download_csv(flg) {
-    
+
     var bunrui = $('#bunruiselector').val();
     var shihyo = $('#shihyoselector').val();
     var shihyotxt = $('#shihyoselector option:selected').text();
-    
+
     var prefecture = $('#prefectureselector').val();
     var observatory =  $('#observatoryselector').val();
-    
+
     var year = yearSlider.values[0];
     var month =  $('#monthselector').val();
+    
+    var kansho =  $('#kanshoselector').val();
 
 
     //1時間で始まる指標には先頭にFをつける
@@ -916,13 +957,13 @@ var portalUrl =  "https://nies.maps.arcgis.com";
     if (regex.test(shihyo)) {
       shihyo = "F" + shihyo;
     }
-    
+
     var fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", shihyo];
-    
+
     if (bunrui == "月別値") {
       fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", "月", shihyo];
     }
-    
+
     var query = shihyoLayer.createQuery();
 
     /*
@@ -931,7 +972,7 @@ var portalUrl =  "https://nies.maps.arcgis.com";
       expression = "年 = " + year + " AND 月 = " + month;
     }
     */
-    var expression = "1 =1";
+    var expression = "官署 = '" + kansho + "'";
     
     if (flg == 0) {
       if (prefecture != "全国" && observatory != "全て"){
@@ -948,53 +989,53 @@ var portalUrl =  "https://nies.maps.arcgis.com";
         shihyotxt = shihyotxt + "_全国";
       }
     } else {
-      
+
       query.geometry = view.extent;
       shihyotxt = shihyotxt + "_マップ範囲のみ";
     }
-    
+
     query.outFields = fields;
-    
+
     query.orderByFields = "地点番号,年";
     if (bunrui == "月別値") {
       query.orderByFields = "地点番号,年,月";
     }
-    
+
     query.returnGeometry = false;
     query.maxRecordCountFactor = 10;
 
     var records = [];
-    
+
     shihyoLayer.queryFeatures(query)
       .then(function(response){
       var features = response.features;
 
       for (let i = 0; i < features.length; ++i) {
         var att = features[i].attributes;
-        
+
         var record = [];
         for (let j = 0; j < fields.length; ++j) {
           record.push(att[fields[j]]);
         }
         records.push(record);
       }
-      
+
       startDownload(shihyotxt, fields, records);
     });
 
 
     function startDownload(shihyo, fields, records) {
-      const filename = "アメダス_" + shihyo + '.csv';
-      
+      const filename = kansho + "_" + shihyo + '.csv';
+
       var csv_text = fields.join(',') + "\r\n";
-      
+
       for (let i = 0; i < records.length; ++i) {
         for (let j = 0; j < records[i].length; ++j) {
           csv_text = csv_text + records[i][j] + ",";
         }
         csv_text = csv_text + "\r\n";
       }
-      
+
       //BOMを付与する（Excelでの文字化け対策）
       const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
       //Blobでデータを作成する
