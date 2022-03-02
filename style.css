@@ -1,0 +1,211 @@
+html,
+body {
+  height: 100%;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+#site-header {
+  background: #F7F7F7;
+  height: 10vh;
+}
+
+#site-header::before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 5px;
+    background: #f1ff2a;
+    background: -moz-linear-gradient(left, #64CFFF 0%, #e51cd6 40%, #f1752a 70%, #f1ff2a 100%);
+    background: -webkit-gradient(linear, left center, right center, from(#64CFFF), color-stop(40%, #e51cd6), color-stop(70%, #f1752a), to(#f1ff2a));
+    background: -webkit-linear-gradient(left, #64CFFF 0%, #e51cd6 40%, #f1752a 70%, #f1ff2a 100%);
+   background: -o-linear-gradient(left, #64CFFF 0%, #e51cd6 40%, #f1752a 70%, #f1ff2a 100%);
+    background: -ms-linear-gradient(left, #64CFFF 0%, #e51cd6 40%, #f1752a 70%, #f1ff2a 100%);
+   background: linear-gradient(to right, #64CFFF 0%, #e51cd6 40%, #f1752a 70%, #f1ff2a 100%s);
+}
+
+#A-PLAT_logo {
+  height: 40px;
+  margin-top: 10px;
+  margin-right:50px;
+}
+
+#NIES_logo {
+  height: 40px;
+  margin-top: 10px;
+}
+
+#site-footer::before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 5px;
+    background: #f1752a;
+  background: -moz-linear-gradient(left, #64CFFF 0%, #e51cd6 44%, #f1752a 100%);
+  background: -webkit-gradient(linear, left center, right center, from(#64CFFF), color-stop(44%, #e51cd6), to(#f1752a));
+  background: -webkit-linear-gradient(left, #64CFFF 0%, #e51cd6 44%, #f1752a 100%);
+  background: -o-linear-gradient(left, #64CFFF 0%, #e51cd6 44%, #f1752a 100%);
+  background: -ms-linear-gradient(left, #64CFFF 0%, #e51cd6 44%, #f1752a 100%);
+  background: linear-gradient(to right, #64CFFF 0%, #e51cd6 44%, #f1752a 100%);
+}
+
+#site-footer {
+  background-color: #E3E5E5;
+  height: 10vh;
+  border-bottom: 15px solid #CCCCCC;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+}
+
+#site-footer_menu {
+  margin-right: 0;
+  padding-top: 5px;
+  width: 100vw - 200px;
+}
+
+#site-footer_menu a {
+  padding-left: 20px;
+  font-size: 12px;
+  color: gray;
+}
+
+#site-footer_info {
+  padding-left: 5px;
+  width: 100%;
+}
+
+#site-footer_info p {
+  font-size: 9px;
+}
+
+#footer_menu{
+  list-style: none;
+}
+
+.nav_wrapper{  
+  display: flex;
+  list-style: none;
+}
+
+.nav__item a {
+  display: block;
+  padding: 1.5rem 1rem; }
+
+
+#mainDiv {
+  height: 80vh;
+  display: flex;
+  flex-direction: row;
+}
+
+#headerDiv {
+  width: 30%;
+  height: 100%;
+  margin-right: 10px;
+  display: flex;
+  flex-direction: column;
+  background: #F7F7F7;
+}
+
+#displayDiv {
+  width: 70%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  /*overflow: hidden;*/
+  margin-bottom: 10px;
+}
+
+#mapviewDiv {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#mapviewCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+#graphviewDiv {
+  display: none;
+  height: 100%;
+  width: 100%;
+}
+
+#graphviewCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+#graphviewDisableDiv {
+  display: block;
+  width: 100%;
+  height: 100%;
+  font-size: 24px;
+  text-align: center;
+  margin-top: 20vh;
+}
+
+h2 {
+  font-size: 14px;
+  margin-bottom: 0px;
+}
+
+p4 {
+  font-size: 12px;
+  margin-bottom: 0px;
+}
+.dropdown {
+  position: relative;
+  display:block;
+  width: 100%;
+  min-height:20px;
+  font-size: 16px;
+  align-items:center;
+  /*overflow: hidden;*/
+  white-space:nowrap;
+}
+
+.download {
+  display: flex;
+  flex-direction: column;
+  margin-top: 5px;
+}
+.hidden {
+  display:none;
+}
+
+#yearselector{
+  width: 90%;
+  height: 50px;
+}
+
+.esri-widget {
+  font-size: 12px !important;
+}
+
+.esri-ui-corner .esri-expand .esri-widget--panel, .esri-ui-corner .esri-expand .esri-widget--panel-height-only, .esri-ui-corner .esri-component>.esri-widget--panel, .esri-ui-corner .esri-component.esri-widget--panel {
+  width: 200px !important;
+}
+
+.esri-popup__inline-actions-container:only-child>.esri-popup__action, .esri-popup__inline-actions-container:only-child>.esri-popup__action-toggle {
+  max-width: 30% !important;
+}
+
+.button {
+  height: 40px;
+  width: 140px;
+  cursor: pointer;
+  background-color: #cccccc;
+  border-radius: 5px;
+}
+
+.button:hover {
+  background-color: #bbbbbb;
+}
+
+.esri-legend__layer-caption {
+  display: none !important;
+}
