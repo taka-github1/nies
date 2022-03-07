@@ -19,7 +19,7 @@
             "chart": "line"
         },
         {
-            "index": 0,
+            "index": 1,
             "bunrui": "年間値",
             "title": "日最高気温の年平均",
             "label": "日最高気温の年平均(℃)",
@@ -27,7 +27,7 @@
             "chart": "line"
         },
         {
-            "index": 0,
+            "index": 2,
             "bunrui": "年間値",
             "title": "日最低気温の年平均",
             "label": "日最低気温の年平均(℃)",
@@ -35,7 +35,7 @@
             "chart": "line"
         },
         {
-            "index": 0,
+            "index": 3,
             "bunrui": "年間値",
             "title": "猛暑日の年間日数",
             "label": "猛暑日の年間日数(日)",
@@ -43,7 +43,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 4,
             "bunrui": "年間値",
             "title": "真夏日の年間日数",
             "label": "真夏日（日最高気温30℃以上）の年間日数(日)",
@@ -51,7 +51,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 5,
             "bunrui": "年間値",
             "title": "夏日の年間日数",
             "label": "夏日（日最高気温25℃以上）の年間日数(日)",
@@ -59,7 +59,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 6,
             "bunrui": "年間値",
             "title": "熱帯夜の年間日数",
             "label": "熱帯夜（日最低気温25℃以上）の年間日数(日)",
@@ -67,7 +67,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 7,
             "bunrui": "年間値",
             "title": "冬日の年間日数",
             "label": "冬日（日最低気温0℃以下）の年間日数(日)",
@@ -75,7 +75,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 8,
             "bunrui": "年間値",
             "title": "真冬日の年間日数",
             "label": "真冬日（日最高気温0℃以下）の年間日数(日)",
@@ -83,7 +83,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 9,
             "bunrui": "年間値",
             "title": "年降水量",
             "label": "年降水量(mm)",
@@ -91,7 +91,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 10,
             "bunrui": "年間値",
             "title": "日降水量の年最大値",
             "label": "日降水量の年最大値(mm)",
@@ -99,7 +99,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 11,
             "bunrui": "年間値",
             "title": "日降水量100mm以上の年間日数",
             "label": "日降水量100mm以上の年間日数(日)",
@@ -107,7 +107,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 12,
             "bunrui": "年間値",
             "title": "日降水量200mm以上の年間日数",
             "label": "日降水量200mm以上の年間日数(日)",
@@ -115,7 +115,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 13,
             "bunrui": "年間値",
             "title": "無降水日年間日数",
             "label": "無降水日年間日数(日)",
@@ -123,7 +123,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 14,
             "bunrui": "年間値",
             "title": "年最大積雪深",
             "label": "年最大積雪深(cm)",
@@ -131,7 +131,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 15,
             "bunrui": "年間値",
             "title": "日降雪量の年最大値",
             "label": "日降雪量の年最大値(cm)",
@@ -139,7 +139,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 101,
             "bunrui": "月別値",
             "title": "月平均気温",
             "label": "月平均気温(℃)",
@@ -147,7 +147,7 @@
             "chart": "line"
         },
         {
-            "index": 0,
+            "index": 102,
             "bunrui": "月別値",
             "title": "日最高気温の月平均",
             "label": "日最高気温の月平均(℃)",
@@ -155,7 +155,7 @@
             "chart": "line"
         },
         {
-            "index": 0,
+            "index": 103,
             "bunrui": "月別値",
             "title": "日最低気温の月平均",
             "label": "日最低気温の月平均(℃)",
@@ -163,7 +163,7 @@
             "chart": "line"
         },
         {
-            "index": 0,
+            "index": 104,
             "bunrui": "月別値",
             "title": "月降水量",
             "label": "月降水量(mm)",
@@ -171,7 +171,7 @@
             "chart": "bar"
         },
         {
-            "index": 0,
+            "index": 105,
             "bunrui": "月別値",
             "title": "月最大積雪深",
             "label": "月最大積雪深(cm)",
