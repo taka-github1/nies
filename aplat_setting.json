@@ -1,7 +1,7 @@
 {
     "appId": "QUUUOLXshMCe9OSp",
     "base_webmap_id": "5decc9034e304d448ca4411b6e6b8929",
-   "basemap_group_id": "4a80faca3d4443898a277ac332ae820e",
+    "basemap_group_id": "4a80faca3d4443898a277ac332ae820e",
     "default_extend": {
         "xmin": 126.2331,
         "ymin": 31.367,
@@ -9,6 +9,11 @@
         "ymax": 44.3821
     },
     "defalt_year": 2019,
+    "chartArea_backgroundColor": "rgba(230,238,255,1)",
+    "linechart_borderColor": "rgba(0,169,255,1)",
+    "linechart_backgroundColor": "rgba(0,169,255,1)",
+    "barchart_borderColor": "rgba(0,169,255,1)",
+    "barchart_backgroundColor": "rgba(0,169,255,1)",
     "shihyo": [
         {
             "index": 0,
