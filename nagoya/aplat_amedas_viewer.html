@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+          name="viewport"
+          content="initial-scale=1,maximum-scale=1,user-scalable=no"
+          />
+    <title>アメダス</title>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.22/esri/themes/light/main.css"/>
+    <link rel="stylesheet" type="text/css" href=https://js.arcgis.com/calcite-components/1.0.0-beta.76/calcite.css />
+    <link rel="stylesheet" href="style.css"/>
+    <script src="lib/Chart.bundle.min.js"></script>
+    <script src="lib/jquery-3.5.1.min.js"></script>
+    <script src="lib/dom-to-image.js"></script>
+    <script src="https://js.arcgis.com/4.22/"></script>
+    <script type="module" src=https://js.arcgis.com/calcite-components/1.0.0-beta.76/calcite.esm.js></script>
+    <script src="app.js"></script>
+  </head>
+
+  <body>         
+    <header id="site-header">
+      <div id="site-header_menu">
+        <a href="https://adaptation-platform.nies.go.jp/index.html"><img src="https://adaptation-platform.nies.go.jp/img/alplat_logo.png" alt="A-PLAT logo" id="A-PLAT_logo"></a>
+      </div> 
+    </header> 
+    <div id="mainDiv">
+      <calcite-action-bar id="actionbarDiv" slot="action-bar" expand-disabled>
+        <calcite-action id="sideExpand" data-action-id="Conditions" icon="chevrons-left" text="条件指定" active></calcite-action>
+      </calcite-action-bar>
+      <calcite-panel id="sideDiv" height-scale="l" data-panel-id="Conditions" widthScale="s">
+        <div id="headerDiv">
+          <h2>表示切替</h2>
+          <calcite-radio-group id="displayselector" scale="m">
+            <calcite-radio-group-item value="mapview" checked>
+              <calcite-icon icon="map" scale="s"></calcite-icon>マップ
+            </calcite-radio-group-item>
+            <calcite-radio-group-item value="graphview">
+              <calcite-icon icon="graph-time-series" scale="s"></calcite-icon>グラフ
+            </calcite-radio-group-item>
+          </calcite-radio-group>
+          <h2>指標選択</h2>
+          <calcite-select id="shihyoselector" scale="m" width="auto">
+          </calcite-select>
+          <h2>官署選択</h2>
+          <calcite-radio-group id="kanshoselector" scale="m">
+            <calcite-radio-group-item value="アメダス" checked>アメダス
+            </calcite-radio-group-item>
+            <calcite-radio-group-item value="気象官署">気象官署
+            </calcite-radio-group-item>
+          </calcite-radio-group>
+          <h2>観測所選択</h2>
+          <p4>都道府県</p4>
+          <calcite-select id="prefectureselector" scale="m" width="half">
+            <calcite-option value="全国">全国</calcite-option>
+          </calcite-select>
+          <p4>観測所</p4>
+          <calcite-select id="observatoryselector" scale="m" width="half">
+            <calcite-option value="全て">全て</calcite-option>
+          </calcite-select>
+          <div id="yearselectorDiv"> 
+            <h2>観測年</h2>
+            <div id="yearselector" class="slider"></div>
+          </div>
+          <div id="monthselectorDiv" class="hidden"> 
+            <h2>月</h2>
+            <calcite-select id="monthselector" scale="m" width="half">
+              <calcite-option value="1">&nbsp;1月</calcite-option>
+              <calcite-option value="2">&nbsp;2月</calcite-option>
+              <calcite-option value="3">&nbsp;3月</calcite-option>
+              <calcite-option value="4">&nbsp;4月</calcite-option>
+              <calcite-option value="5">&nbsp;5月</calcite-option>
+              <calcite-option value="6">&nbsp;6月</calcite-option>
+              <calcite-option value="7">&nbsp;7月</calcite-option>
+              <calcite-option value="8">&nbsp;8月</calcite-option>
+              <calcite-option value="9">&nbsp;9月</calcite-option>
+              <calcite-option value="10">10月</calcite-option>
+              <calcite-option value="11">11月</calcite-option>
+              <calcite-option value="12">12月</calcite-option>
+            </calcite-select>
+          </div>
+          <h2>ファイルダウンロード</h2>
+          <div class="download">
+            <button class="button" id="csv_observatory">
+              <calcite-icon icon="file-csv" scale="s"></calcite-icon>CSVファイル
+            </button>
+          </div>
+        </div>
+      </calcite-panel>
+      <div id="displayDiv">
+        <div id="mapviewDiv">
+          <div id="mapviewCanvas"></div>
+        </div>
+        <div id="graphviewDiv">
+          <div id="graphviewDisableDiv">
+            観測所を指定してください
+          </div>
+          <canvas id="graphviewCanvas" style="display: none"/>
+        </div>
+        <button class="button" id="map_observatory">
+          <calcite-icon icon="map" scale="s"></calcite-icon>画像保存
+        </button>
+        <button class="button" id="graph_observatory" style="display: none">
+          <calcite-icon icon="graph-time-series" scale="s"></calcite-icon>画像保存
+        </button>
+      </div>
+    </div>
+    <canvas id="export_canvas" width="200px" height="200px" style="display: none"></canvas>
+    <footer id="site-footer">
+      <a href="https://www.nies.go.jp/"><img src="https://www.nies.go.jp/common/images/h91jrr000000003v-img/h91jrr0000000087.png" alt="NIES-logo" id="NIES_logo"></a>
+      <div id="site-footer_info">
+        <div id="site-footer_menu">
+          <a href="https://adaptation-platform.nies.go.jp/about/contact.html">お問い合わせ</a>
+          <a href="https://adaptation-platform.nies.go.jp/about/policy.html">サイトポリシー</a>
+          <a href="https://www.nies.go.jp/kojinjoho/privacypolicy.html">プライバシーポリシー</a><br/>
+        </div>
+        <p>
+          このサイトは、国立研究開発法人国立環境研究所が運営しています。<br/>
+        
+          © National Institute for Environmental Studies. All Rights Reserved.            
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
