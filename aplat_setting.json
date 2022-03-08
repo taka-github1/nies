@@ -10,10 +10,10 @@
     },
     "defalt_year": 2019,
     "chartArea_backgroundColor": "rgba(230,238,255,1)",
-    "linechart_borderColor": "rgba(0,169,255,1)",
+    "linechart_borderColor": "rgba(0,0,0,1)",
     "linechart_backgroundColor": "rgba(0,169,255,1)",
-    "barchart_borderColor": "rgba(0,169,255,1)",
-    "barchart_backgroundColor": "rgba(0,169,255,1)",
+    "barchart_borderColor": "rgba(84,130,53,1)",
+    "barchart_backgroundColor": "rgba(112,173,71,1)",
     "shihyo": [
         {
             "index": 0,
