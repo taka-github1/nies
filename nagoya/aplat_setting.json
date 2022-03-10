@@ -222,8 +222,8 @@
             "label": "月最大積雪深(cm)",
             "field": "月最大積雪深",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,169,255,1)",
+            "backgroundColor": "rgba(0,169,255,1)"
         }
     ]
 }
