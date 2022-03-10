@@ -116,6 +116,7 @@ body {
   width: 80%;
   min-width: 250px;
   padding: 15px;
+  padding-top: 0px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -162,19 +163,30 @@ body {
 }
 
 h2 {
+  font-size: 16px;
+  font-family: arial black;
+  align-content: center;
+  line-height: 2;
+  margin-top: 10px;
+  margin-bottom: 0px;
+  
+}
+
+h3 {
   font-size: 14px;
+  font-family: arial black;
+  align-content: center;
+  letter-spacing: 0.05em;
+  line-height: 2;
+  margin-top: 0px;
   margin-bottom: 0px;
 }
 
-p4 {
-  font-size: 12px;
-  margin-bottom: 0px;
-}
 .dropdown {
   position: relative;
   display:block;
   width: 100%;
-  min-height:20px;
+  min-height: 20px;
   font-size: 16px;
   align-items:center;
   /*overflow: hidden;*/
@@ -211,11 +223,25 @@ p4 {
   max-width: 30% !important;
 }
 
+.helpbutton {
+  height: 40px;
+  width: 160px;
+  cursor: pointer;
+  background-color: rgb(255, 242, 204);
+  border: 0;
+  border-radius: 5px;
+}
+
+.helpbutton:hover {
+  background-color: rgb(255, 255, 153);
+}
+
 .button {
-  height: 30px;
+  height: 40px;
   width: 140px;
   cursor: pointer;
-  background-color: #cccccc;
+  background-color: rgb(226, 240, 217);
+  border: 0;
   border-radius: 5px;
 }
 
@@ -226,6 +252,42 @@ p4 {
 .esri-legend__layer-caption {
   display: none !important;
 }
+
+calcite-icon {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#helpDialog {
+  display: flex;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0%;
+  right: 0%;
+  z-index: 4;
+  background-color: rgba(70, 70, 70, 0.9);
+}
+
+#helpDialog-contents {
+  display: block;
+  position: static;
+  word-break: break-all;
+  font-size: 14px;
+  padding: 20px 20px 20px 20px;
+  height: 50%;
+  width: 80%;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-right: auto;
+  color: black;
+  overflow-y: auto;
+  background-color: rgb(255, 242, 204);
+}
+
+
+
 
 @media screen and (max-width:600px) {
   #sideDiv {
@@ -239,5 +301,12 @@ p4 {
   }
   .esri-ui-corner .esri-expand .esri-widget--panel, .esri-ui-corner .esri-expand .esri-widget--panel-height-only, .esri-ui-corner .esri-component>.esri-widget--panel, .esri-ui-corner .esri-component.esri-widget--panel {
     width: 160px !important;
+  }
+  #site-footer {
+    display: none;
+  }
+  
+  #helpDialog-contents {
+    height: 100%; 
   }
 }
