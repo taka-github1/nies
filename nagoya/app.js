@@ -668,6 +668,9 @@ require([
     var xAxesMin = Math.floor(Math.min.apply(null, labels) / 10 * 10);
     var xAxesMax = Math.ceil(Math.max.apply(null, labels) / 10 * 10); 
     var yAxesMin = Math.floor(Math.min.apply(null, datas) - 1);
+    if (chart_type == "bar") {
+      yAxesMin = 0;
+    }
     var yAxesMax = Math.ceil(Math.max.apply(null, datas) + 1);
     
     chart = new Chart(ctx, {
@@ -726,7 +729,7 @@ require([
               fontSize: scales_fontSize
             },
             ticks: {
-              min: 0,
+              min: yAxesMin,
               max: yAxesMax,
               userCallback: function(label, index, labels) {
                 if (Math.floor(label) === label) {
