@@ -10,10 +10,6 @@
     },
     "defalt_year": 2019,
     "chartArea_backgroundColor": "rgba(230,238,255,1)",
-    "linechart_borderColor": "rgba(0,0,0,1)",
-    "linechart_backgroundColor": "rgba(255,255,255,1)",
-    "barchart_borderColor": "rgba(84,130,53,1)",
-    "barchart_backgroundColor": "rgba(255,255,255,1)",
     "shihyo": [
         {
             "index": 0,
@@ -222,8 +218,8 @@
             "label": "月最大積雪深(cm)",
             "field": "月最大積雪深",
             "chart": "bar",
-            "borderColor": "rgba(0,169,255,1)",
-            "backgroundColor": "rgba(0,169,255,1)"
+            "borderColor": "rgba(84,130,53,1)",
+            "backgroundColor": "rgba(255,255,255,1)"
         }
     ]
 }
