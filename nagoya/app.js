@@ -892,6 +892,11 @@ require([
     
     ctx.fillStyle = "black";
     ctx.font = "24px serif";
+    
+    if (window.innerWidth < breakpoint_width) {
+    ctx.font = "12px serif";
+    }
+    
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.fillText(export_text, 10, 10);
