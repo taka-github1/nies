@@ -8,7 +8,7 @@ var graphicsLayer = null;
 var chart = null;
 
 //configの読み込み
-var json_url = "aplat_setting.json";
+var json_url = "https://taka-github1.github.io/nies/aplat_setting.json";
 $.ajaxSetup({async: false});
 $.getJSON(json_url, function(json) {
   config = json;
@@ -16,7 +16,10 @@ $.getJSON(json_url, function(json) {
 $.ajaxSetup({async: true});
 
 var base_webmap_id = config.base_webmap_id;
-var basemap_group_id = config.basemap_group_id;
+//var base_webmap_id = "ce2dd3b7d9064d3f81eaa38621fe8e9d";  //NIES
+
+var basemap_group_id = config.basemap_group_id;  //AGOL
+//var basemap_group_id = "0a489e5adeab43e1be2d570ea3149af3";  //NIES
 
 var default_extend = config.default_extend;
 
@@ -140,9 +143,17 @@ require([
   });
   
   view.extent = default_extend;
-
+  
 
   //イベント処理
+  $('#helpbutton').click(function () {
+    $('#helpDialog').fadeIn();
+  });
+  
+  $('#agreebutton').click(function () {
+    $(this).parents('#helpDialog').fadeOut();
+  });
+  
   $('#displayselector').on("calciteRadioGroupChange", function(event) { 
     if (event.target.value == "mapview") {
       $("#mapviewDiv").show();
@@ -274,8 +285,10 @@ require([
     var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     
     if (display == "graphview") {
+      $('#yearselector-label').addClass('hidden');
       $('#yearselectorDiv').addClass('hidden');
     } else {
+      $('#yearselector-label').removeClass('hidden');
       $('#yearselectorDiv').removeClass('hidden');
     }
     
