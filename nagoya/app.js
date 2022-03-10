@@ -564,13 +564,7 @@ require([
     var monthtxt = $('#monthselector calcite-option:selected').text();
     
     var kansho =  $('#kanshoselector').val();
-    
-    //1時間で始まる指標には先頭にFをつける
-    var field = shihyo;
-    var regex = new RegExp(/^1.*$/);
-    if (regex.test(shihyo)) {
-      field = "F" + shihyo;
-    }
+    var field  = config.shihyo.find(v => v.title === shihyo).field;
 
     //グラフ作成
     let query = shihyoLayer.createQuery();
@@ -755,16 +749,11 @@ require([
     var year = yearSlider.values[0];
     var month =  $('#monthselector').val();
     var kansho =  $('#kanshoselector').val(); 
+    var field  = config.shihyo.find(v => v.title === shihyo).field;
 
-    //1時間で始まる指標には先頭にFをつける
-    var regex = new RegExp(/^1.*$/);
-    if (regex.test(shihyo)) {
-      shihyo = "F" + shihyo;
-    }
-
-    var fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", shihyo];
+    var fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", field];
     if (bunrui == "月別値") {
-      fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", "月", shihyo];
+      fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", "月", field];
     }
 
     var query = shihyoLayer.createQuery();
