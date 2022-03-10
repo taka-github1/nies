@@ -8,7 +8,7 @@ var graphicsLayer = null;
 var chart = null;
 
 //configの読み込み
-var json_url = "https://taka-github1.github.io/nies/aplat_setting.json";
+var json_url = "https://taka-github1.github.io/nies/nagoya/aplat_setting.json";
 $.ajaxSetup({async: false});
 $.getJSON(json_url, function(json) {
   config = json;
@@ -635,6 +635,9 @@ require([
     var month =  $('#monthselector').val();
 
     var chart_type = config["shihyo"].find(value => value.title == shihyo).chart;
+    var borderColor = config["shihyo"].find(value => value.title == shihyo).borderColor;
+    var backgroundColor = config["shihyo"].find(value => value.title == shihyo).backgroundColor;
+    /*
     var borderColor = config["linechart_borderColor"];
     var backgroundColor = config["linechart_backgroundColor"];
 
@@ -642,6 +645,7 @@ require([
       borderColor = config["barchart_borderColor"];
       backgroundColor = config["barchart_backgroundColor"];
     }
+    */
     
     var title_fontSize = 24;
     var scales_fontSize = 16;
