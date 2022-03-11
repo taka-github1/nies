@@ -12,106 +12,143 @@
     <link rel="stylesheet" href="style.css"/>
     <script src="lib/Chart.bundle.min.js"></script>
     <script src="lib/jquery-3.5.1.min.js"></script>
+    <script src="lib/dom-to-image.js"></script>
     <script src="https://js.arcgis.com/4.22/"></script>
     <script type="module" src=https://js.arcgis.com/calcite-components/1.0.0-beta.76/calcite.esm.js></script>
     <script src="app.js"></script>
   </head>
 
-  <body>
+  <body>         
     <header id="site-header">
       <div id="site-header_menu">
-        <a href="https://adaptation-platform.nies.go.jp/index.html"><img src="https://adaptation-platform.nies.go.jp/img/alplat_logo.png" alt="A-PLAT logo" id="A-PLAT_logo"></a>
-      </div>
+        <a href="https://adaptation-platform.nies.go.jp/index.html"><img src="img/alplat_logo.png" alt="A-PLAT logo" id="A-PLAT_logo"></a>
+      </div> 
     </header> 
     <div id="mainDiv">
-      <div id="headerDiv">
-        <h2>表示切替</h2>
-        <calcite-radio-group id="displayselector" scale="m">
-          <calcite-radio-group-item value="mapview" checked>
-            <calcite-icon icon="map" scale="s"></calcite-icon>マップ
-          </calcite-radio-group-item>
-          <calcite-radio-group-item value="graphview">
-            <calcite-icon icon="graph-time-series" scale="s"></calcite-icon>グラフ
-          </calcite-radio-group-item>
-        </calcite-radio-group>
-        <h2>指標選択</h2>
-        <calcite-select id="shihyoselector" scale="m" width="auto">
-          <calcite-option-group label="年間値">
-            <calcite-option value="年平均気温">年平均気温(℃)</calcite-option>
-            <calcite-option value="日最高気温の年平均">日最高気温の年平均(℃)</calcite-option>
-            <calcite-option value="日最低気温の年平均">日最低気温の年平均(℃)</calcite-option>
-            <calcite-option value="猛暑日の年間日数">猛暑日（日最高気温35℃以上）の年間日数(日)</calcite-option>
-            <calcite-option value="真夏日の年間日数">真夏日（日最高気温30℃以上）の年間日数(日)</calcite-option>
-            <calcite-option value="夏日の年間日数">夏日（日最高気温25℃以上）の年間日数(日)</calcite-option>
-            <calcite-option value="熱帯夜の年間日数">熱帯夜（日最低気温25℃以上）の年間日数(日)</calcite-option>
-            <calcite-option value="冬日の年間日数">冬日（日最低気温0℃以下）の年間日数(日)</calcite-option>
-            <calcite-option value="真冬日の年間日数">真冬日（日最高気温0℃以下）の年間日数(日)</calcite-option>
-            <calcite-option value="年降水量">年降水量(mm)</calcite-option>
-            <calcite-option value="日降水量の年最大値">日降水量の年最大値(mm)</calcite-option>
-            <calcite-option value="日降水量100mm以上の年間日数">日降水量100mm以上の年間日数(日)</calcite-option>
-            <calcite-option value="日降水量200mm以上の年間日数">日降水量200mm以上の年間日数(日)</calcite-option>
-            <calcite-option value="日降水量200mm以上の年間日数">無降水日年間日数(日)</calcite-option>
-            <calcite-option value="年最大積雪深">年最大積雪深(cm)</calcite-option>
-            <calcite-option value="日降雪量の年最大値">日降雪量の年最大値(cm)</calcite-option>
-          </calcite-option-group>
-          <calcite-option-group label="月別値">
-            <calcite-option value="月平均気温">月平均気温(℃)</calcite-option>
-            <calcite-option value="日最高気温の月平均">日最高気温の月平均(℃)</calcite-option>
-            <calcite-option value="日最低気温の月平均">日最低気温の月平均(℃)</calcite-option>
-            <calcite-option value="月降水量">月降水量(mm)</calcite-option>
-            <calcite-option value="月最大積雪深">月最大積雪深(cm)</calcite-option>
-          </calcite-option-group>
-        </calcite-select>
-        <h2>官署選択</h2>
-        <calcite-radio-group id="kanshoselector" scale="m">
-          <calcite-radio-group-item value="アメダス" checked>アメダス
-          </calcite-radio-group-item>
-          <calcite-radio-group-item value="気象官署">気象官署
-          </calcite-radio-group-item>
-        </calcite-radio-group>
-        <h2>観測所選択</h2>
-        <p4>都道府県</p4>
-        <calcite-select id="prefectureselector" scale="m" width="half">
-          <calcite-option value="全国">全国</calcite-option>
-        </calcite-select>
-        <p4>観測所</p4>
-        <calcite-select id="observatoryselector" scale="m" width="half">
-          <calcite-option value="全て">全て</calcite-option>
-        </calcite-select>
-        <div id="yearselectorDiv"> 
-          <h2>観測年</h2>
-          <div id="yearselector" class="slider"></div>
-        </div>
-        <div id="monthselectorDiv" class="hidden"> 
-          <h2>月</h2>
-          <calcite-select id="monthselector" scale="m" width="half">
-            <calcite-option value="1">&nbsp;1月</calcite-option>
-            <calcite-option value="2">&nbsp;2月</calcite-option>
-            <calcite-option value="3">&nbsp;3月</calcite-option>
-            <calcite-option value="4">&nbsp;4月</calcite-option>
-            <calcite-option value="5">&nbsp;5月</calcite-option>
-            <calcite-option value="6">&nbsp;6月</calcite-option>
-            <calcite-option value="7">&nbsp;7月</calcite-option>
-            <calcite-option value="8">&nbsp;8月</calcite-option>
-            <calcite-option value="9">&nbsp;9月</calcite-option>
-            <calcite-option value="10">10月</calcite-option>
-            <calcite-option value="11">11月</calcite-option>
-            <calcite-option value="12">12月</calcite-option>
+      <calcite-action-bar id="actionbarDiv" slot="action-bar" expand-disabled>
+        <calcite-action id="sideExpand" data-action-id="Conditions" icon="chevrons-left" text="条件指定" active></calcite-action>
+      </calcite-action-bar>
+      <calcite-panel id="sideDiv" height-scale="l" data-panel-id="Conditions" widthScale="s">
+        <div id="headerDiv">
+          <h2 id="help-label">
+            はじめに必ずご確認ください
+          </h2>
+          <button class="helpbutton" id="helpbutton">
+            <calcite-icon icon="exclamation-mark-triangle" scale="s"></calcite-icon>使用方法・注意事項
+          </button>
+          <calcite-tooltip-manager>
+            <h2 id="displayselector-label">
+              <calcite-icon icon="refresh" scale="s"></calcite-icon>
+              右画面切り替え
+            </h2>
+            <calcite-tooltip reference-element="displayselector-label">
+              右側の表示をマップ（分布）とグラフ（観測地点の経年変化）に切り替えます。
+              グラフは観測所選択で観測地点まで選択しないと表示されません。
+            </calcite-tooltip>
+          </calcite-tooltip-manager>
+          <calcite-radio-group id="displayselector" scale="m">
+            <calcite-radio-group-item value="mapview" checked>
+              <calcite-icon icon="map" scale="s"></calcite-icon>マップ
+            </calcite-radio-group-item>
+            <calcite-radio-group-item value="graphview">
+              <calcite-icon icon="graph-time-series" scale="s"></calcite-icon>グラフ
+            </calcite-radio-group-item>
+          </calcite-radio-group>
+          <calcite-tooltip-manager>
+            <h2 id="kanshoselector-label">
+              <calcite-icon icon="rain" scale="s"></calcite-icon>
+              官署／アメダス
+            </h2>
+            <calcite-tooltip reference-element="kanshoselector-label">
+              気象官署とは地上気象観測所を示していて、158か所の観測地点があります。
+              アメダスとは地域気象観測システムを示していて、590か所の観測地点があります。
+            </calcite-tooltip> 
+          </calcite-tooltip-manager>
+          <calcite-radio-group id="kanshoselector" scale="m">
+            <calcite-radio-group-item value="アメダス" checked>アメダス
+            </calcite-radio-group-item>
+            <calcite-radio-group-item value="気象官署">気象官署
+            </calcite-radio-group-item>
+          </calcite-radio-group>
+          <calcite-tooltip-manager>
+            <h2 id="shihyoselector-label">
+              <calcite-icon icon="chart-gear" scale="s"></calcite-icon>
+              指標
+            </h2>
+            <calcite-tooltip reference-element="shihyoselector-label">
+              種類は年別値（年ごとの平均データ）と月別値（月ごとの年平均データ）を選択できます。
+              気温や降水量、降雪・積雪量に関わる統計値を選択できます。
+            </calcite-tooltip> 
+          </calcite-tooltip-manager>
+          <calcite-select id="shihyoselector" scale="m" width="auto">
           </calcite-select>
+          <calcite-tooltip-manager>
+            <h2 id="yearselector-label">
+              <calcite-icon icon="calendar" scale="s"></calcite-icon>
+              観測年（月）
+            </h2>
+            <calcite-tooltip reference-element="yearselector-label">
+              年をスライダーで選択することで、該当する年のデータがマップに表示されます。
+              月は指標の種類で「月別値」を選択したときに表示され、該当する月のデータを確認できます。
+            </calcite-tooltip> 
+          </calcite-tooltip-manager>
+          <div id="yearselectorDiv"> 
+            <h4>年</h4>
+            <div id="yearselector" class="slider"></div>
+          </div>
+          <div id="monthselectorDiv" class="hidden"> 
+            <h4>月</h4>
+            <calcite-select id="monthselector" scale="m" width="half">
+              <calcite-option value="1">&nbsp;1月</calcite-option>
+              <calcite-option value="2">&nbsp;2月</calcite-option>
+              <calcite-option value="3">&nbsp;3月</calcite-option>
+              <calcite-option value="4">&nbsp;4月</calcite-option>
+              <calcite-option value="5">&nbsp;5月</calcite-option>
+              <calcite-option value="6">&nbsp;6月</calcite-option>
+              <calcite-option value="7">&nbsp;7月</calcite-option>
+              <calcite-option value="8">&nbsp;8月</calcite-option>
+              <calcite-option value="9">&nbsp;9月</calcite-option>
+              <calcite-option value="10">10月</calcite-option>
+              <calcite-option value="11">11月</calcite-option>
+              <calcite-option value="12">12月</calcite-option>
+            </calcite-select>
+          </div>
+          <calcite-tooltip-manager>
+            <h2 id="observatoryselector-label">
+              <calcite-icon icon="map-pin" scale="s"></calcite-icon>
+              観測所
+            </h2>
+            <calcite-tooltip reference-element="observatoryselector-label">
+              都道府県を選択することで、マップが選択したところに拡大されます。
+              観測地点は都道府県選択によって絞りこまれます。選択するとマップは該当地点まで拡大されます。
+              観測地点まで選択すると、経年変化のグラフを確認することができます。
+            </calcite-tooltip> 
+          </calcite-tooltip-manager>
+          <h3>都道府県</h3>
+          <calcite-select id="prefectureselector" scale="m" width="half">
+            <calcite-option value="全国">全国</calcite-option>
+          </calcite-select>
+          <h3>観測地点</h3>
+          <calcite-select id="observatoryselector" scale="m" width="half">
+            <calcite-option value="全て">全て</calcite-option>
+          </calcite-select>
+          <calcite-tooltip-manager>
+            <h2 id="download-label">
+              <calcite-icon icon="download" scale="s"></calcite-icon>
+              ダウンロード（選択地点）
+            </h2>
+            <calcite-tooltip reference-element="download-label">
+              数値データは選択された地点のデータがcsv形式でダウンロードすることができます。
+              画像のダウンロードでは、右側に表示されているマップやグラフを画像としてダウンロードできます。
+            </calcite-tooltip> 
+          </calcite-tooltip-manager>
+          <div class="download">
+            <button class="button" id="csv_observatory">
+              <calcite-icon icon="file-csv" scale="s"></calcite-icon>数値データ
+            </button>
+          </div>
         </div>
-        <h2>ファイルダウンロード</h2>
-        <div class="download">
-          <button class="button" id="csv_observatory">
-            <calcite-icon icon="file-csv" scale="s"></calcite-icon>CSVファイル
-          </button>
-          <button class="button" id="map_observatory">
-            <calcite-icon icon="map" scale="s"></calcite-icon>マップ画像
-          </button>
-          <button class="button" id="graph_observatory" style="display: none">
-            <calcite-icon icon="graph-time-series" scale="s"></calcite-icon>グラフ画像
-          </button>
-        </div>
-      </div>
+      </calcite-panel>
       <div id="displayDiv">
         <div id="mapviewDiv">
           <div id="mapviewCanvas"></div>
@@ -122,10 +159,17 @@
           </div>
           <canvas id="graphviewCanvas" style="display: none"/>
         </div>
+        <button class="button" id="map_observatory">
+          <calcite-icon icon="map" scale="s"></calcite-icon>マップ画像
+        </button>
+        <button class="button" id="graph_observatory" style="display: none">
+          <calcite-icon icon="graph-time-series" scale="s"></calcite-icon>グラフ画像
+        </button>
       </div>
     </div>
+    <canvas id="export_canvas" width="200px" height="200px" style="display: none"></canvas>
     <footer id="site-footer">
-      <a href="https://www.nies.go.jp/"><img src="https://www.nies.go.jp/common/images/h91jrr000000003v-img/h91jrr0000000087.png" alt="NIES-logo" id="NIES_logo"></a>
+      <a href="https://www.nies.go.jp/"><img src="img/nies_logo.png" alt="NIES-logo" id="NIES_logo"></a>
       <div id="site-footer_info">
         <div id="site-footer_menu">
           <a href="https://adaptation-platform.nies.go.jp/about/contact.html">お問い合わせ</a>
@@ -139,5 +183,33 @@
         </p>
       </div>
     </footer>
+    
+    <div id="helpDialog" style="display:none">
+      <div id='helpDialog-contents'>
+        <h2>
+          注意事項：長期変化傾向の評価について
+        </h2>
+        <h4>
+          観測地点の移転等でデータが均質でない場合、地点単独の長期変化傾向の評価が不適切な場合があります。その場合、統計値の補正や統計値を都道府県・全国平均にすることで、長期変化傾向の評価をしています。長期変化傾向の評価を確認したい場合は以下もご参照ください。
+        </h4>
+        <h4>
+          ▼気象庁：大雨や猛暑日など（極端現象）のこれまでの変化<br/>
+          <a href="https://www.data.jma.go.jp/cpdinfo/extreme/extreme_p.html">
+            https://www.data.jma.go.jp/cpdinfo/extreme/extreme_p.html
+          </a>
+        </h4>
+        <h4>
+          ▼A-PLAT：気象観測データ（気象庁提供）<br/>
+          <a href="https://adaptation-platform.nies.go.jp/map/observation.html">
+            https://adaptation-platform.nies.go.jp/map/observation.html
+          </a>
+        </h4>
+        <h4>
+        （※回帰直線の機能を追加したときに、条件によっては注意事項を追加する可能性あり、枠がさらに必要になる可能性があります）
+        </h4>
+        <br>
+        <button class="button" id="agreebutton">閉じる</button>
+      </div>
+    </div>
   </body>
 </html>
