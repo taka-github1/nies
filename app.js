@@ -1,3 +1,4 @@
+var breakpoint_width = 600;
 var map = null;
 var view = null;
 var legend = null;
@@ -6,16 +7,17 @@ var left_layer = null;
 var graphicsLayer = null;
 var chart = null;
 
-var base_webmap_id = "ce2dd3b7d9064d3f81eaa38621fe8e9d";  //NIES
+//configの読み込み
+var json_url = "aplat_setting.json";
+$.ajaxSetup({async: false});
+$.getJSON(json_url, function(json) {
+  config = json;
+});
+$.ajaxSetup({async: true});
 
-var basemap_group_id = "0a489e5adeab43e1be2d570ea3149af3";  //NIES
-
-var default_extend = {
-  xmin: 126.2331,
-  ymin: 31.367,
-  xmax: 151.5675,
-  ymax: 44.3821
-}
+var base_webmap_id = config.base_webmap_id;
+var basemap_group_id = config.basemap_group_id;
+var default_extend = config.default_extend;
 
 require([
   "esri/portal/Portal",
@@ -43,12 +45,14 @@ require([
   var portalUrl =  "https://nies.maps.arcgis.com";
 
   var info = new OAuthInfo({
-    appId: "QUUUOLXshMCe9OSp",
+    appId: config.appId,
     popup: false
   });
 
   identityManager.registerOAuthInfos([info]);
   identityManager.getCredential(portalUrl);
+  
+  initForm();
   
   map = new WebMap({
     portalItem: {
@@ -119,23 +123,31 @@ require([
     labelFormatFunction: function(value, type){
       return value + "年";
     },
-    values: [ 2019 ],
+    values: [ config.defalt_year ],
     visibleElements: {
       labels: true,
       rangeLabels: true
     }
   });
 
-  view.when(function() {
+  map.when(function() {
     setForm(true);
     setFilter(false);
     draw_charts();
   });
   
   view.extent = default_extend;
-
+  
 
   //イベント処理
+  $('#helpbutton').click(function () {
+    $('#helpDialog').fadeIn();
+  });
+  
+  $('#agreebutton').click(function () {
+    $(this).parents('#helpDialog').fadeOut();
+  });
+  
   $('#displayselector').on("calciteRadioGroupChange", function(event) { 
     if (event.target.value == "mapview") {
       $("#mapviewDiv").show();
@@ -174,7 +186,7 @@ require([
   $('#observatoryselector').on("calciteSelectChange", function(event) {
     setForm(false);
     setFilter(true);
-    draw_charts();
+    draw_charts(); 
   });
 
   yearSlider.on("thumb-change", function(event) {
@@ -205,17 +217,72 @@ require([
   $('#graph_observatory').click(function() {
     startGraphDownload();
   });
+  
+  //サイドパネルの展開・折りたたみ処理
+  $("#sideExpand").on("click", function(event) {
+    var dispShowVW = "90vw";
+    var dispHideVW = "50vw";
+    if (window.innerWidth < breakpoint_width) {
+      dispShowVW = "90vw";
+      dispHideVW = "0vw";
+    }
+    
+    if (event.target.icon == "chevrons-left") { //展開
+      $("#sideExpand").attr("icon", "chevrons-right");
+      $("#sideDiv").css('display','none'); 
+      $("#displayDiv").css('width', dispShowVW);
+    } else {  //折りたたみ
+      $("#sideExpand").attr("icon", "chevrons-left");
+      $("#sideDiv").css('display','block'); 
+      $("#displayDiv").css('width', dispHideVW);
+    } 
+    draw_charts();
+  });
+  
+  
+  function initForm(){
+    var selector = document.getElementById("shihyoselector");
 
-
-  function setForm(init_flg){
+    var shihyo = config.shihyo;
+    var group = null;
+    var group_title = "";
+    for (var i=0;i<shihyo.length;i++) {
+      var title = shihyo[i]["title"];
+      var label = shihyo[i]["label"];
+      var bunrui = shihyo[i]["bunrui"];
+      
+      if (bunrui != group_title) {
+        var group = document.createElement("calcite-option-group");
+        group.setAttribute('label', bunrui);
+        group.innerHTML = bunrui;
+        selector.appendChild(group);
+        group_title = bunrui;
+      }
+      
+      var option = document.createElement("calcite-option");
+      option.setAttribute('value', title);
+      option.innerHTML = label;
+      
+      if (i==0) {
+        option.setAttribute('selected', true);
+      }
+      group.appendChild(option);
+    }
+    
+    $("#shihyoselector").val(config.shihyo[0].title);
+  }
+  
+  async function setForm(init_flg){
     var display = $('#displayselector').val();
-    var bunrui = $('#shihyoselector')[0].selectedOption.parentElement.label;
-    var shihyo = $('#shihyoselector').val();
     var month =  $('#monthselector').val();
-
+    var shihyo = $('#shihyoselector').val();
+    var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
+    
     if (display == "graphview") {
+      $('#yearselector-label').addClass('hidden');
       $('#yearselectorDiv').addClass('hidden');
     } else {
+      $('#yearselector-label').removeClass('hidden');
       $('#yearselectorDiv').removeClass('hidden');
     }
     
@@ -281,17 +348,13 @@ require([
     ];
     query.returnGeometry = false;
 
-    shihyoLayer.queryFeatures(query)
-      .then(function(response){
+    var response = await shihyoLayer.queryFeatures(query);
+    var features = response.features;
+    var min_year = features[0].attributes["最小年"];
+    var max_year = features[0].attributes["最大年"];
 
-      var features = response.features;
-      var min_year = features[0].attributes["最小年"];
-      var max_year = features[0].attributes["最大年"];
-
-      yearSlider.min = min_year;
-      yearSlider.max = max_year;
-
-    });
+    yearSlider.min = min_year;
+    yearSlider.max = max_year;
 
     if (!init_flg) {
       return;
@@ -325,34 +388,32 @@ require([
     ];
     query.returnGeometry = false;
 
-    shihyoLayer.queryFeatures(query)
-      .then(function(response){
-      var features = response.features;
-      var recordes = [];
-      $('#prefectureselector > calcite-option').remove();
+    response = await shihyoLayer.queryFeatures(query);
+    var features = response.features;
+    var recordes = [];
+    $('#prefectureselector > calcite-option').remove();
+    const item = document.createElement("calcite-option");
+    item.setAttribute("label", "全国");
+    item.setAttribute("value", "全国");
+    $('#prefectureselector').append(item);
+
+    for(var i = 0; i< features.length; i++) {
+      var area = features[i].attributes["都道府県リスト"];
       const item = document.createElement("calcite-option");
-      item.setAttribute("label", "全国");
-      item.setAttribute("value", "全国");
+      item.setAttribute("label", area);
+      item.setAttribute("value", area);
       $('#prefectureselector').append(item);
-
-      for(var i = 0; i< features.length; i++) {
-        var area = features[i].attributes["都道府県リスト"];
-        const item = document.createElement("calcite-option");
-        item.setAttribute("label", area);
-        item.setAttribute("value", area);
-        $('#prefectureselector').append(item);
-      }
-      $('#prefectureselector').prop("selectedIndex", 0);
-      setObservatoryselector(init_flg);
-
-    });
+    }
+    $('#prefectureselector').prop("selectedIndex", 0);
+    setObservatoryselector(init_flg);
   }
 
   async function setObservatoryselector(init_flg) {
 
     var prefecture = $('#prefectureselector').val();
     var observatory = $('#observatoryselector').val();
-    var bunrui = $('#shihyoselector')[0].selectedOption.parentElement.label;
+    var shihyo = $('#shihyoselector').val();
+    var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     var month =  $('#monthselector').val();
     
     var kansho =  $('#kanshoselector').val();
@@ -416,13 +477,14 @@ require([
   }
 
   function setFilter(zoom_flg) {
-    var bunrui = $('#shihyoselector')[0].selectedOption.parentElement.label;
     var prefecture = $('#prefectureselector').val();
     var observatory =  $('#observatoryselector').val();
     var year = yearSlider.values[0];
     var month =  $('#monthselector').val();
     var kansho =  $('#kanshoselector').val();
-
+    var shihyo = $('#shihyoselector').val();
+    var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
+    
     shihyoLayer.definitionExpression = "";
 
     var expression = "官署 = '" + kansho + "'";
@@ -431,7 +493,7 @@ require([
     if (bunrui == "月別値") { 
       expression = expression + " AND 月 = " + month;
     }
-
+    
     if (prefecture != "全国" && observatory != "全て"){
       shihyoLayer.definitionExpression = expression + " AND 都道府県 = '" + prefecture + "' AND 観測地点名 = '" + observatory + "'";
 
@@ -455,11 +517,14 @@ require([
         view.extent = default_extend;
       }
     }
-
+    
 
     function zoomToLayer() {
+      let opts = {
+        duration: 2000
+      };
       return shihyoLayer.queryExtent().then(function(response) {
-        view.goTo(response.extent.clone().expand(1.2))
+        view.goTo(response.extent.clone().expand(1.2), opts)
           .catch(function(error){
           if (error.name != "AbortError"){
             console.error(error);
@@ -470,9 +535,13 @@ require([
   }
 
   function draw_charts(observatory) {
+    
+    if (shihyoLayer == null) {
+      return;
+    }
 
-    var bunrui = $('#shihyoselector')[0].selectedOption.parentElement.label;
     var shihyo = $('#shihyoselector').val();
+    var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
     var prefecture = $('#prefectureselector').val();
 
@@ -490,17 +559,10 @@ require([
     }
 
     var month =  $('#monthselector').val();
-    //var monthtxt = $('#monthselector option:selected').text();
     var monthtxt = $('#monthselector calcite-option:selected').text();
     
     var kansho =  $('#kanshoselector').val();
-    
-    //1時間で始まる指標には先頭にFをつける
-    var field = shihyo;
-    var regex = new RegExp(/^1.*$/);
-    if (regex.test(shihyo)) {
-      field = "F" + shihyo;
-    }
+    var field  = config.shihyo.find(v => v.title === shihyo).field;
 
     //グラフ作成
     let query = shihyoLayer.createQuery();
@@ -529,7 +591,6 @@ require([
       var datas = [];
       for(var i = 0; i< features.length; i++) {
         var year = features[i].attributes["年"];
-        //var value = features[i].attributes["value"];
         var value = features[i].attributes[field];
 
         labels.push(year);
@@ -549,194 +610,148 @@ require([
   function update_chart(chat_title, labels, datas){
 
     var ctx = document.getElementById("graphviewCanvas").getContext('2d');
-
+    
     if (chart != null) {
       chart.destroy();
     }
 
-    var bunrui = $('#shihyoselector')[0].selectedOption.parentElement.label;
     var shihyo = $('#shihyoselector').val();
+    var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
     var prefecture = $('#prefectureselector').val();
     var observatory =  $('#observatoryselector').val();
     var month =  $('#monthselector').val();
 
+    var chart_type = config["shihyo"].find(value => value.title == shihyo).chart;
+    var borderColor = config["shihyo"].find(value => value.title == shihyo).borderColor;
+    var backgroundColor = config["shihyo"].find(value => value.title == shihyo).backgroundColor;
+    /*
+    var borderColor = config["linechart_borderColor"];
+    var backgroundColor = config["linechart_backgroundColor"];
+
+    if (chart_type == "bar") {
+      borderColor = config["barchart_borderColor"];
+      backgroundColor = config["barchart_backgroundColor"];
+    }
+    */
+    
+    var title_fontSize = 24;
+    var scales_fontSize = 16;
+    
+    if (window.innerWidth < breakpoint_width) {
+      title_fontSize = 12;
+      scales_fontSize = 9;
+    }
+    
     var datasets = [];
     datasets.push({
       data: datas,
-      borderColor: "rgba(0,169,255,1)",
-      backgroundColor: "rgba(0,169,255,1)",
+      borderColor: borderColor,
+      backgroundColor: backgroundColor,
       lineTension: 0,
       pointStyle: 'circle',
-      radius: 2,
+      borderWidth: 1,
+      radius: 3,
       fill: false
     });
 
     var yLabel = shihyotxt;
-    
-    // 配列linechartに折れ線グラフの指標を格納する： "年平均気温", "日最高気温の年平均  ", "日最低気温の年平均", "月平均気温",  "日最高気温の月平均", "日最低気温の月平均"
-    const linecharts = [
-      "年平均気温",
-      "日最高気温の年平均  ",
-      "日最低気温の年平均",
-      "月平均気温",
-      "日最高気温の月平均",
-      "日最低気温の月平均"
-    ]
-    // 配列linechartsに指標が含まれる場合はラインチャート
-    if (linecharts.includes(shihyo) == true) {
-      chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: datasets
-        },
-        options: {
-          title: {
-            display: true,
-            text: chat_title
-          },
-          layout: {
-            padding: {
-              left: 0,
-              right: 0,
-              top: 0
-            }
-          },
-          legend: {
-            display: false,
-            position: 'right',
-            labels: {
-              boxWidth: 20,
-              usePointStyle: true,
-              padding: 10
-            }
-          },
-          scales: {
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: '観測年',
-                fontSize: 12
-              },
-              ticks: {
-                beginAtZero: true,
-                stepSize: 1,
-                callback: function(value, index, values){
-                  return  value
-                }
-              }
-            }],
-            yAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: yLabel,
-                fontSize: 12
-              },
-              ticks: {
-                beginAtZero: true,
-                userCallback: function(label, index, labels) {
-                  if (Math.floor(label) === label) {
-                    return label;
-                  }
-                }
-              }
-            }]
-          },
-          chartArea: {
-            backgroundColor: 'rgba(230, 238, 255, 1)'
-          },
-          responsive: true,
-          maintainAspectRatio: false
-         }
-      });
- // それ以外ではバーチャート
-    } else {
-      chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: datasets
-        },
-        options: {
-          title: {
-            display: true,
-            text: chat_title
-          },          
-          layout: {
-            padding: {
-              left: 0,
-              right: 0,
-              top: 0
-            }
-          },
-          legend: {
-            display: false,
-            position: 'right',
-            labels: {
-              boxWidth: 20,
-              usePointStyle: true,
-              padding: 10
-            }
-          },
-          scales: {
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: '観測年',
-                fontSize: 12
-              },
-              ticks: {
-                beginAtZero: true,
-                stepSize: 1,
-                callback: function(value, index, values){
-                  return  value
-                }
-              }
-            }],
-            yAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: yLabel,
-                fontSize: 12
-              },
-              ticks: {
-                beginAtZero: true,
-                userCallback: function(label, index, labels) {
-                  if (Math.floor(label) === label) {
-                    return label;
-                  }
-                }
-              }
-            }]
-          },
-          responsive: true,
-          maintainAspectRatio: false
-        }
-      });
+
+    var xAxesMin = Math.floor(Math.min.apply(null, labels) / 10 * 10);
+    var xAxesMax = Math.ceil(Math.max.apply(null, labels) / 10 * 10); 
+    var yAxesMin = Math.floor(Math.min.apply(null, datas) - 1);
+    if (chart_type == "bar") {
+      yAxesMin = 0;
     }
+    var yAxesMax = Math.ceil(Math.max.apply(null, datas) + 1);
+    
+    chart = new Chart(ctx, {
+      type: chart_type,
+      data: {
+        labels: labels,
+        datasets: datasets
+      },
+      options: {
+        title: {
+          display: true,
+          fontSize: title_fontSize,
+          text: chat_title
+        },         
+        layout: {
+          padding: {
+            left: 0,
+            right: 0,
+            top: 0
+          }
+        },
+        legend: {
+          display: false,
+          position: 'right',
+          labels: {
+            boxWidth: 20,
+            usePointStyle: true,
+            padding: 10
+          }
+        },
+        scales: {
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: '観測年',
+              fontSize: scales_fontSize
+            },
+            ticks: {
+              autoSkip: false,
+              min: xAxesMin,
+              max: xAxesMax,
+              //stepSize: 5,
+              callback: function(value, index, values){
+                if (value%5==0){
+                  return  value + "年";  
+                } else {
+                  return "";
+                }
+              }
+            }
+          }],
+          yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: yLabel,
+              fontSize: scales_fontSize
+            },
+            ticks: {
+              min: yAxesMin,
+              max: yAxesMax,
+              userCallback: function(label, index, labels) {
+                if (Math.floor(label) === label) {
+                  return label;
+                }
+              }
+            }
+          }]
+        },
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
   }
 
 
   function download_csv(flg) {
-    var bunrui = $('#shihyoselector')[0].selectedOption.parentElement.label;
     var shihyo = $('#shihyoselector').val();
+    var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
     var prefecture = $('#prefectureselector').val();
     var observatory =  $('#observatoryselector').val();
     var year = yearSlider.values[0];
     var month =  $('#monthselector').val();
-    var kansho =  $('#kanshoselector').val();
+    var kansho =  $('#kanshoselector').val(); 
+    var field  = config.shihyo.find(v => v.title === shihyo).field;
 
-    //1時間で始まる指標には先頭にFをつける
-    var regex = new RegExp(/^1.*$/);
-    if (regex.test(shihyo)) {
-      shihyo = "F" + shihyo;
-    }
-
-    var fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", shihyo];
+    var fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", field];
     if (bunrui == "月別値") {
-      fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", "月", shihyo];
+      fields = ["地点番号", "都道府県", "観測地点名", "緯度", "経度", "年", "月", field];
     }
 
     var query = shihyoLayer.createQuery();
@@ -803,16 +818,12 @@ require([
         }
         csv_text = csv_text + "\r\n";
       }
-
-      //BOMを付与する（Excelでの文字化け対策）
+      
       const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
-      //Blobでデータを作成する
       const blob = new Blob([bom, csv_text], { type: 'text/csv'});
-
-      //IE10/11用
+      
       if (window.navigator.msSaveBlob) {
         window.navigator.msSaveBlob(blob, filename);
-        //その他ブラウザ
       } else {
         const url = (window.URL || window.webkitURL).createObjectURL(blob);
         const download = document.createElement('a');
@@ -823,18 +834,69 @@ require([
       }
     }
   }
-  
-  function startMapDownload() {
+
+  async function startMapDownload() {
+    var prefecture = $('#prefectureselector').val();
+    var observatory =  $('#observatoryselector').val();
+    var year = yearSlider.values[0];
+    var month =  $('#monthselector').val();
+    var kansho =  $('#kanshoselector').val();
+    var shihyo = $('#shihyoselector').val();
+    var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
     
-    view.takeScreenshot().then(function(screenshot) {
-      var a = document.createElement('a');
-      a.href = screenshot.dataUrl;
-      a.download = shihyotxt + '.png';
-      a.click();
-    });
+    var titleHeight = 60;
+    
+    var mapScreenshot = await view.takeScreenshot();
+    var mapImg = new Image();
+    mapImg.src = mapScreenshot.dataUrl;
+    await mapImg.onload;
+    var legendImgUrl = await domtoimage.toPng($(".esri-legend")[0]);
+    const legendImg = new Image();
+    legendImg.src = legendImgUrl;
+    await legendImg.onload;
+
+    var export_canvas = document.getElementById('export_canvas');
+    export_canvas.width = mapImg.width;
+    export_canvas.height = mapImg.height + 60;
+    const ctx = export_canvas.getContext("2d");
+    
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, export_canvas.width, export_canvas.height);
+    
+    var legendDw = 150;
+    var legendDh = 200;
+    var legendDx = export_canvas.width - legendDw - 2;
+    var legendDy = export_canvas.height - legendDh - 2;
+    
+    ctx.drawImage(mapImg, 0, 0, mapImg.width, mapImg.height, 0,  titleHeight, mapImg.width, mapImg.height);
+    ctx.drawImage(legendImg, 0, 0, legendImg.width, legendImg.height, legendDx, legendDy, legendDw, legendDh);
+
+    var export_text = shihyotxt + " ";
+    if (bunrui == "年間値") {
+      export_text += year + "年観測";
+    } else {
+      export_text += year + "年" + month + "月観測";
+    }
+    
+    ctx.fillStyle = "black";
+    ctx.font = "24px serif";
+    
+    if (window.innerWidth < breakpoint_width) {
+    ctx.font = "12px serif";
+    }
+    
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText(export_text, 10, 10);
+
+    var a = document.createElement('a');
+    a.href = export_canvas.toDataURL();
+    a.download = shihyotxt + '.png';
+    a.click();
   }
-  
+
   function startGraphDownload() {
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
     var observatory =  $('#observatoryselector').val();
