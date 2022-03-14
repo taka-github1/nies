@@ -627,6 +627,7 @@ require([
     var chart_type = config["shihyo"].find(value => value.title == shihyo).chart;
     var borderColor = config["shihyo"].find(value => value.title == shihyo).borderColor;
     var backgroundColor = config["shihyo"].find(value => value.title == shihyo).backgroundColor;
+    var yAxesStep = config["shihyo"].find(value => value.title == shihyo).yAxesStep;
     
     var title_fontSize = 24;
     var scales_fontSize = 16;
@@ -652,11 +653,11 @@ require([
 
     var xAxesMin = Math.floor(Math.min.apply(null, labels) / 10 * 10);
     var xAxesMax = Math.ceil(Math.max.apply(null, labels) / 10 * 10); 
-    var yAxesMin = Math.floor(Math.min.apply(null, datas) - 1);
+    var yAxesMin = Math.floor(Math.min.apply(null, datas) / yAxesStep) * yAxesStep;
     if (chart_type == "bar") {
       yAxesMin = 0;
     }
-    var yAxesMax = Math.ceil(Math.max.apply(null, datas) + 1);
+    var yAxesMax = Math.ceil(Math.max.apply(null, datas) / yAxesStep) * yAxesStep;
     
     chart = new Chart(ctx, {
       type: chart_type,
@@ -716,12 +717,14 @@ require([
               display: true,
               labelString: yLabel,
               fontSize: scales_fontSize,
-              fontColor: '#000000'
+              fontColor: '#000000',
+              stepSize: yAxesStep,
             },
             ticks: {
               min: yAxesMin,
               max: yAxesMax,
               fontColor: '#000000',
+              stepSize: yAxesStep,
               userCallback: function(label, index, labels) {
                 if (Math.floor(label) === label) {
                   return label;
