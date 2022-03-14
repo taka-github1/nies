@@ -19,7 +19,8 @@
             "field": "年平均気温",
             "chart": "line",
             "borderColor": "rgba(0,0,0,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "backgroundColor": "rgba(255,255,255,1)",
+            "yAxesStep": 1
         },
         {
             "index": 1,
@@ -29,7 +30,8 @@
             "field": "日最高気温の年平均",
             "chart": "line",
             "borderColor": "rgba(0,0,0,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "backgroundColor": "rgba(255,255,255,1)",
+            "yAxesStep": 1
         },
         {
             "index": 2,
@@ -39,7 +41,8 @@
             "field": "日最低気温の年平均",
             "chart": "line",
             "borderColor": "rgba(0,0,0,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "backgroundColor": "rgba(255,255,255,1)",
+            "yAxesStep": 1
         },
         {
             "index": 3,
@@ -48,8 +51,9 @@
             "label": "猛暑日の年間日数(日)",
             "field": "猛暑日の年間日数",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 4,
@@ -58,8 +62,9 @@
             "label": "真夏日（日最高気温30℃以上）の年間日数(日)",
             "field": "真夏日の年間日数",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 5,
@@ -68,8 +73,9 @@
             "label": "夏日（日最高気温25℃以上）の年間日数(日)",
             "field": "夏日の年間日数",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 6,
@@ -78,8 +84,9 @@
             "label": "熱帯夜（日最低気温25℃以上）の年間日数(日)",
             "field": "熱帯夜の年間日数",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 7,
@@ -88,8 +95,9 @@
             "label": "冬日（日最低気温0℃以下）の年間日数(日)",
             "field": "冬日の年間日数",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 8,
@@ -98,8 +106,9 @@
             "label": "真冬日（日最高気温0℃以下）の年間日数(日)",
             "field": "真冬日の年間日数",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 9,
@@ -108,8 +117,9 @@
             "label": "年降水量(mm)",
             "field": "年降水量",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 200
         },
         {
             "index": 10,
@@ -118,8 +128,9 @@
             "label": "日降水量の年最大値(mm)",
             "field": "日降水量の年最大値",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 11,
@@ -128,8 +139,9 @@
             "label": "日降水量100mm以上の年間日数(日)",
             "field": "日降水量100mm以上の年間日数",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 12,
@@ -138,8 +150,9 @@
             "label": "日降水量200mm以上の年間日数(日)",
             "field": "日降水量200mm以上の年間日数",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 13,
@@ -148,8 +161,9 @@
             "label": "無降水日年間日数(日)",
             "field": "無降水日年間日数",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 14,
@@ -158,8 +172,9 @@
             "label": "年最大積雪深(cm)",
             "field": "年最大積雪深",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 50
         },
         {
             "index": 15,
@@ -168,8 +183,9 @@
             "label": "日降雪量の年最大値(cm)",
             "field": "日降雪量の年最大値",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 10
         },
         {
             "index": 101,
@@ -179,7 +195,8 @@
             "field": "月平均気温",
             "chart": "line",
             "borderColor": "rgba(0,0,0,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "backgroundColor": "rgba(255,255,255,1)",
+            "yAxesStep": 1
         },
         {
             "index": 102,
@@ -189,7 +206,8 @@
             "field": "日最高気温の月平均",
             "chart": "line",
             "borderColor": "rgba(0,0,0,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "backgroundColor": "rgba(255,255,255,1)",
+            "yAxesStep": 1
         },
         {
             "index": 103,
@@ -199,7 +217,8 @@
             "field": "日最低気温の月平均",
             "chart": "line",
             "borderColor": "rgba(0,0,0,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "backgroundColor": "rgba(255,255,255,1)",
+            "yAxesStep": 1
         },
         {
             "index": 104,
@@ -208,8 +227,9 @@
             "label": "月降水量(mm)",
             "field": "月降水量",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         },
         {
             "index": 105,
@@ -218,8 +238,9 @@
             "label": "月最大積雪深(cm)",
             "field": "月最大積雪深",
             "chart": "bar",
-            "borderColor": "rgba(84,130,53,1)",
-            "backgroundColor": "rgba(255,255,255,1)"
+            "borderColor": "rgba(0,0,0,1)",
+            "backgroundColor": "rgba(84,130,53,1)",
+            "yAxesStep": 20
         }
     ]
 }
