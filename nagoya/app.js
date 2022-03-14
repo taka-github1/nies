@@ -627,15 +627,6 @@ require([
     var chart_type = config["shihyo"].find(value => value.title == shihyo).chart;
     var borderColor = config["shihyo"].find(value => value.title == shihyo).borderColor;
     var backgroundColor = config["shihyo"].find(value => value.title == shihyo).backgroundColor;
-    /*
-    var borderColor = config["linechart_borderColor"];
-    var backgroundColor = config["linechart_backgroundColor"];
-
-    if (chart_type == "bar") {
-      borderColor = config["barchart_borderColor"];
-      backgroundColor = config["barchart_backgroundColor"];
-    }
-    */
     
     var title_fontSize = 24;
     var scales_fontSize = 16;
@@ -677,6 +668,7 @@ require([
         title: {
           display: true,
           fontSize: title_fontSize,
+          fontColor: '#000000',
           text: chat_title
         },         
         layout: {
@@ -690,6 +682,7 @@ require([
           display: false,
           position: 'right',
           labels: {
+            fontColor: '#000000',
             boxWidth: 20,
             usePointStyle: true,
             padding: 10
@@ -700,12 +693,14 @@ require([
             scaleLabel: {
               display: true,
               labelString: '観測年',
-              fontSize: scales_fontSize
+              fontSize: scales_fontSize,
+              fontColor: '#000000'
             },
             ticks: {
               autoSkip: false,
               min: xAxesMin,
               max: xAxesMax,
+              fontColor: '#000000',
               //stepSize: 5,
               callback: function(value, index, values){
                 if (value%5==0){
@@ -720,11 +715,13 @@ require([
             scaleLabel: {
               display: true,
               labelString: yLabel,
-              fontSize: scales_fontSize
+              fontSize: scales_fontSize,
+              fontColor: '#000000'
             },
             ticks: {
               min: yAxesMin,
               max: yAxesMax,
+              fontColor: '#000000',
               userCallback: function(label, index, labels) {
                 if (Math.floor(label) === label) {
                   return label;
