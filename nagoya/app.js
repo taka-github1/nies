@@ -1,11 +1,13 @@
 var breakpoint_width = 600;
 var map = null;
 var view = null;
+var exportView = null;
 var legend = null;
 var current_field = null;
 var left_layer = null;
 var graphicsLayer = null;
 var chart = null;
+var exportChart = null;
 
 //configの読み込み
 var json_url = "aplat_setting.json";
@@ -68,8 +70,12 @@ require([
     zoom: 14,
     constraints: {
       minScale : 50000000,
-      maxScale : 5000
+      maxScale : 250000
     }
+  });
+  exportView = new MapView({
+    container: "exportMapviewCanvas",
+    map: map
   });
 
   var shihyoLayer = null;
@@ -142,12 +148,12 @@ require([
   
 
   //イベント処理
-  $('#helpbutton').click(function () {
-    $('#helpDialog').fadeIn();
+  $('#attentionButton').click(function () { 
+    $('#attentionDialog').fadeIn();
   });
   
   $('#agreebutton').click(function () {
-    $(this).parents('#helpDialog').fadeOut();
+    $(this).parents('#attentionDialog').fadeOut();
   });
   
   $('#displayselector').on("calciteRadioGroupChange", function(event) { 
@@ -220,22 +226,28 @@ require([
     startGraphDownload();
   });
   
+  $('#exportsizeselector').on("calciteSelectChange", function(event) {
+    draw_charts();
+  });
+  
   //サイドパネルの展開・折りたたみ処理
   $("#sideExpand").on("click", function(event) {
     var dispShowVW = "90vw";
     var dispHideVW = "50vw";
     if (window.innerWidth < breakpoint_width) {
       dispShowVW = "90vw";
-      dispHideVW = "0vw";
+      dispHideVW = "1px";
     }
     
     if (event.target.icon == "chevrons-left") { //展開
       $("#sideExpand").attr("icon", "chevrons-right");
-      $("#sideDiv").css('display','none'); 
+      $("#sideDiv").css('width', "0vw");
+      $("#sideDiv").css('opacity','0'); 
       $("#displayDiv").css('width', dispShowVW);
     } else {  //折りたたみ
       $("#sideExpand").attr("icon", "chevrons-left");
-      $("#sideDiv").css('display','block'); 
+      $("#sideDiv").css('width', "40vw");
+      $("#sideDiv").css('opacity','1'); 
       $("#displayDiv").css('width', dispHideVW);
     } 
     draw_charts();
@@ -536,7 +548,7 @@ require([
     }
   }
 
-  function draw_charts(observatory) {
+  async function draw_charts() {
     
     if (shihyoLayer == null) {
       return;
@@ -546,10 +558,24 @@ require([
     var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
     var prefecture = $('#prefectureselector').val();
-
-    if (observatory == undefined) {
-      observatory =  $('#observatoryselector').val();
+    var observatory =  $('#observatoryselector').val();
+    var size = $('#exportsizeselector').val();
+    var graphWidth = 800;
+    var graphHeight = 600;
+    if (size == "SVGA 800×600") {
+      graphWidth = 800;
+      graphHeight = 600;
+    } else if (size == "XGA	1024×768") {
+      graphWidth = 1024;
+      graphHeight = 768;
+    } else if (size == "WXGA 1280×800") {
+      graphWidth = 1280;
+      graphHeight = 800;
     }
+    $("#exportGraphDiv").css("width", graphWidth);
+    $("#exportGraphDiv").css("height", graphHeight);
+    $("#exportGraphviewCanvas").attr('width', graphWidth);
+    $("#exportGraphviewCanvas").attr('height', graphHeight);
     
     if (observatory == "全て") {
       $("#graphviewDisableDiv").show();
@@ -573,48 +599,73 @@ require([
     ];
     query.orderByFields = "年";
     query.groupByFieldsForStatistics = "年";
-    
+
     var chat_title = observatory + "観測所";
     chat_title = chat_title + "　" + shihyotxt;
-    
+
     var expression = "官署 = '" + kansho + "' AND " + field + " <> " + String(32767);
     if (bunrui == "月別値") { 
       chat_title = chat_title + "　" + monthtxt;
       expression = expression + " AND 月 = " + month;
     }
-    
+
     query.where = expression + " AND 観測地点名 = '" + observatory + "'";
     query.returnGeometry = false;
 
-    shihyoLayer.queryFeatures(query)
-      .then(function(response){ 
-      var features = response.features;
-      var labels = [];
-      var datas = [];
-      for(var i = 0; i< features.length; i++) {
-        var year = features[i].attributes["年"];
-        var value = features[i].attributes[field];
+    var response = await shihyoLayer.queryFeatures(query);
+    var features = response.features;
+    var labels = [];
+    var datas = [];
 
-        labels.push(year);
-        datas.push(Math.round(value * 100) / 100);
+    var before_year = "";
+    for(var i = 0; i< features.length; i++) {
+      var year = features[i].attributes["年"];
+      var value = features[i].attributes[field];
+
+      //年の開始は5の倍数
+      if (i == 0) {
+        var fill_year = Math.floor(year / 5) * 5;;
+        while (fill_year != year) {
+          labels.push(fill_year);
+          datas.push(null);
+          fill_year++;
+        }
+        before_year = year - 1;
       }
 
-      update_chart(chat_title, labels, datas);
-      
-      if (observatory != "全て"){
-        $('#chartDiv').removeClass('hidden');
-      } else {
-        $('#chartDiv').addClass('hidden');
+      //データ欠落年はnullをセット
+      while ((before_year + 1) != year) {
+        labels.push(before_year);
+        datas.push(null);
+        before_year++;
       }
-    });
+
+      labels.push(year);
+      datas.push(Math.round(value * 100) / 100);
+      before_year = year;
+    }
+
+    update_chart("graphviewCanvas", chat_title, labels, datas);
+    update_chart("exportGraphviewCanvas", chat_title, labels, datas);
+
+    if (observatory != "全て"){
+      $('#chartDiv').removeClass('hidden');
+    } else {
+      $('#chartDiv').addClass('hidden');
+    }
   }
 
-  function update_chart(chat_title, labels, datas){
+  function update_chart(element, chat_title, labels, datas){
 
-    var ctx = document.getElementById("graphviewCanvas").getContext('2d');
+    var ctx = document.getElementById(element).getContext('2d');
     
-    if (chart != null) {
-      chart.destroy();
+    var chartElem = chart;
+    if (element == "exportGraphviewCanvas") {
+      chartElem = exportChart;
+    }
+    
+    if (chartElem != null) {
+      chartElem.destroy();
     }
 
     var shihyo = $('#shihyoselector').val();
@@ -646,20 +697,24 @@ require([
       pointStyle: 'circle',
       borderWidth: 1,
       radius: 3,
+      spanGaps: true,
       fill: false
     });
 
     var yLabel = shihyotxt;
 
+    const notnull_datas = datas.filter((item) => {
+      return item !== null && !isNaN(Number(item));
+    });
     var xAxesMin = Math.floor(Math.min.apply(null, labels) / 10 * 10);
     var xAxesMax = Math.ceil(Math.max.apply(null, labels) / 10 * 10); 
-    var yAxesMin = Math.floor(Math.min.apply(null, datas) / yAxesStep) * yAxesStep;
+    var yAxesMin = Math.floor(Math.min.apply(null, notnull_datas) / yAxesStep) * yAxesStep;
     if (chart_type == "bar") {
       yAxesMin = 0;
     }
-    var yAxesMax = Math.ceil(Math.max.apply(null, datas) / yAxesStep) * yAxesStep;
+    var yAxesMax = Math.ceil(Math.max.apply(null, notnull_datas) / yAxesStep) * yAxesStep;
     
-    chart = new Chart(ctx, {
+    chartElem = new Chart(ctx, {
       type: chart_type,
       data: {
         labels: labels,
@@ -697,12 +752,12 @@ require([
               fontSize: scales_fontSize,
               fontColor: '#000000'
             },
+            gridLines: {
+              display: false
+            },
             ticks: {
               autoSkip: false,
-              min: xAxesMin,
-              max: xAxesMax,
               fontColor: '#000000',
-              //stepSize: 5,
               callback: function(value, index, values){
                 if (value%5==0){
                   return  value + "年";  
@@ -809,6 +864,7 @@ require([
     });
 
 
+    //CSVデータの保存
     function startCsvDownload(shihyo, fields, records) {
       const filename = kansho + "_" + shihyo + '.csv';
 
@@ -837,6 +893,7 @@ require([
     }
   }
 
+  //マップ画像の保存
   async function startMapDownload() {
     var prefecture = $('#prefectureselector').val();
     var observatory =  $('#observatoryselector').val();
@@ -846,10 +903,41 @@ require([
     var shihyo = $('#shihyoselector').val();
     var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
-    
+    var size = $('#exportsizeselector').val();
     var titleHeight = 60;
+    var mapWidth = 800;
+    var mapHeight = 540;
+    if (size == "SVGA 800×600") {
+      mapWidth = 800;
+      mapHeight = 540;
+    } else if (size == "XGA	1024×768") {
+      mapWidth = 1024;
+      mapHeight = 708;
+    } else if (size == "WXGA 1280×800") {
+      mapWidth = 1280;
+      mapHeight = 740;
+    }
+    $("#exportMapviewCanvas").css("width", mapWidth);
+    $("#exportMapviewCanvas").css("height", mapHeight);
     
-    var mapScreenshot = await view.takeScreenshot();
+    //描画完了まで待機
+    const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    while (!view.stationary) {
+      await _sleep(1000);
+    }
+
+    exportView.center = view.center;
+    exportView.zoom = view.zoom;
+
+    //描画完了まで待機
+    while (!exportView.stationary) {
+      await _sleep(1000);
+    }
+    while (exportView.updating) {
+      await _sleep(1000);
+    }
+    
+    var mapScreenshot = await exportView.takeScreenshot();
     var mapImg = new Image();
     mapImg.src = mapScreenshot.dataUrl;
     await mapImg.onload;
@@ -875,31 +963,28 @@ require([
     ctx.drawImage(mapImg, 0, 0, mapImg.width, mapImg.height, 0,  titleHeight, mapImg.width, mapImg.height);
     ctx.drawImage(legendImg, 0, 0, legendImg.width, legendImg.height, legendDx, legendDy, legendDw, legendDh);
 
-    var export_text = shihyotxt + " ";
+    var export_text = shihyotxt + "_";
     if (bunrui == "年間値") {
-      export_text += year + "年観測";
+      export_text += year + "年";
     } else {
-      export_text += year + "年" + month + "月観測";
+      export_text += year + "年" + month + "月";
     }
+    export_text += "_分布";
     
     ctx.fillStyle = "black";
     ctx.font = "24px serif";
-    
-    if (window.innerWidth < breakpoint_width) {
-    ctx.font = "12px serif";
-    }
-    
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.fillText(export_text, 10, 10);
 
     var a = document.createElement('a');
     a.href = export_canvas.toDataURL();
-    a.download = shihyotxt + '.png';
+    a.download = export_text + '.png';
     a.click();
   }
 
-  function startGraphDownload() {
+  //グラフ画像の保存
+  async function startGraphDownload() {
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
     var observatory =  $('#observatoryselector').val();
     
@@ -907,11 +992,31 @@ require([
       alert("観測所が選択されていません");
       return;
     }
-
-    var ctx = document.getElementById("graphviewCanvas");
+    
+    var export_text = observatory + "観測所_";
+    export_text += shihyotxt;
+    export_text += "_グラフ";
+    
+    var size = $('#exportsizeselector').val();
+    var graphWidth = 800;
+    var graphHeight = 600;
+    if (size == "SVGA 800×600") {
+      graphWidth = 800;
+      graphHeight = 600;
+    } else if (size == "XGA	1024×768") {
+      graphWidth = 1024;
+      graphHeight = 768;
+    } else if (size == "WXGA 1280×800") {
+      graphWidth = 1280;
+      graphHeight = 800;
+    }
+    $("#exportGraphviewCanvas").attr('width', graphWidth);
+    $("#exportGraphviewCanvas").attr('height', graphHeight);
+    
+    var ctx = document.getElementById("exportGraphviewCanvas");
     var a = document.createElement('a');
     a.href = ctx.toDataURL();
-    a.download = shihyotxt + '.png';
+    a.download = export_text + '.png';
     a.click();
   }
 });
