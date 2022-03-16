@@ -21,7 +21,7 @@
   <body>         
     <header id="site-header">
       <div id="site-header_menu">
-        <a href="https://adaptation-platform.nies.go.jp/index.html"><img src="https://adaptation-platform.nies.go.jp/img/alplat_logo.png" alt="A-PLAT logo" id="A-PLAT_logo"></a>
+        <a href="https://adaptation-platform.nies.go.jp/index.html"><img src="aplat_logo.png" alt="A-PLAT logo" id="A-PLAT_logo"></a>
       </div> 
     </header> 
     <div id="mainDiv">
@@ -33,9 +33,14 @@
           <h2 id="help-label">
             はじめに必ずご確認ください
           </h2>
-          <button class="helpbutton" id="helpbutton">
-            <calcite-icon icon="exclamation-mark-triangle" scale="s"></calcite-icon>使用方法・注意事項
-          </button>
+          <div class="rowAlignment">
+            <button class="helpbutton" id="helpButton" onclick="window.open('https://adaptation-platform.nies.go.jp/map/guide/pdf/kisyodata_kiyaku.pdf')">
+              <calcite-icon icon="exclamation-mark-triangle" scale="s"></calcite-icon>使い方・注意点
+            </button>
+            <button class="helpbutton" id="attentionButton">
+              <calcite-icon icon="exclamation-mark-triangle" scale="s"></calcite-icon>長期変化傾向の評価<br/>について【グラフ】
+            </button>
+          </div>
           <calcite-tooltip-manager>
             <h2 id="displayselector-label">
               <calcite-icon icon="refresh" scale="s"></calcite-icon>
@@ -65,9 +70,9 @@
             </calcite-tooltip> 
           </calcite-tooltip-manager>
           <calcite-radio-group id="kanshoselector" scale="m">
-            <calcite-radio-group-item value="アメダス" checked>アメダス
+            <calcite-radio-group-item value="気象官署" checked>気象官署
             </calcite-radio-group-item>
-            <calcite-radio-group-item value="気象官署">気象官署
+            <calcite-radio-group-item value="アメダス">アメダス
             </calcite-radio-group-item>
           </calcite-radio-group>
           <calcite-tooltip-manager>
@@ -92,12 +97,10 @@
               月は指標の種類で「月別値」を選択したときに表示され、該当する月のデータを確認できます。
             </calcite-tooltip> 
           </calcite-tooltip-manager>
-          <div id="yearselectorDiv"> 
-            <h4>年</h4>
+          <div id="yearselectorDiv">
             <div id="yearselector" class="slider"></div>
           </div>
-          <div id="monthselectorDiv" class="hidden"> 
-            <h4>月</h4>
+          <div id="monthselectorDiv" class="hidden">
             <calcite-select id="monthselector" scale="m" width="half">
               <calcite-option value="1">&nbsp;1月</calcite-option>
               <calcite-option value="2">&nbsp;2月</calcite-option>
@@ -142,34 +145,50 @@
               画像のダウンロードでは、右側に表示されているマップやグラフを画像としてダウンロードできます。
             </calcite-tooltip> 
           </calcite-tooltip-manager>
-          <div class="download">
-            <button class="button" id="csv_observatory">
+          <div class="columnAlignment">
+            <button class="normalbutton" id="csv_observatory">
               <calcite-icon icon="file-csv" scale="s"></calcite-icon>数値データ
             </button>
+            <button class="normalbutton" id="map_observatory">
+              <calcite-icon icon="map" scale="s"></calcite-icon>マップ画像
+            </button>
+            <button class="normalbutton" id="graph_observatory" style="display: none">
+              <calcite-icon icon="graph-time-series" scale="s"></calcite-icon>グラフ画像
+            </button>
+            <calcite-label layout="inline" scale="s">
+              画像サイズ 
+              <calcite-select id="exportsizeselector" scale="s" width="half">
+                <calcite-option>SVGA 800×600</calcite-option>
+                <calcite-option>XGA	1024×768</calcite-option>
+                <calcite-option>WXGA 1280×800</calcite-option>
+              </calcite-select>
+            </calcite-label>
+          </div>
+          <div class="infoPanel">
+            <p>
+              ※数値データ利用の際は<a href="https://adaptation-platform.nies.go.jp/map/guide/pdf/kisyodata_kiyaku.pdf" target="_blank">【利用規約】</a>をご確認ください。<br/>
+              ※画像利用の際は出典を記載ください。<br/>
+              例）「気候変動適応情報プラットフォーム（A-PLAT）[該当ページURL]」
+            </p>
           </div>
         </div>
       </calcite-panel>
       <div id="displayDiv">
         <div id="mapviewDiv">
           <div id="mapviewCanvas"></div>
+          <div id="exportMapviewCanvas"></div>
         </div>
         <div id="graphviewDiv">
           <div id="graphviewDisableDiv">
             観測所を指定してください
           </div>
-          <canvas id="graphviewCanvas" style="display: none"/>
+          <canvas id="graphviewCanvas"></canvas>
         </div>
-        <button class="button" id="map_observatory">
-          <calcite-icon icon="map" scale="s"></calcite-icon>マップ画像
-        </button>
-        <button class="button" id="graph_observatory" style="display: none">
-          <calcite-icon icon="graph-time-series" scale="s"></calcite-icon>グラフ画像
-        </button>
       </div>
     </div>
     <canvas id="export_canvas" width="200px" height="200px" style="display: none"></canvas>
     <footer id="site-footer">
-      <a href="https://www.nies.go.jp/"><img src="https://www.nies.go.jp/common/images/h91jrr000000003v-img/h91jrr0000000087.png" alt="NIES-logo" id="NIES_logo"></a>
+      <a href="https://www.nies.go.jp/"><img src="nies_logo.png" alt="NIES-logo" id="NIES_logo"></a>
       <div id="site-footer_info">
         <div id="site-footer_menu">
           <a href="https://adaptation-platform.nies.go.jp/about/contact.html">お問い合わせ</a>
@@ -184,8 +203,8 @@
       </div>
     </footer>
     
-    <div id="helpDialog" style="display:none">
-      <div id='helpDialog-contents'>
+    <div id="attentionDialog" style="display:none">
+      <div id='attentionDialog-contents'>
         <h2>
           注意事項：長期変化傾向の評価について
         </h2>
@@ -208,8 +227,11 @@
         （※回帰直線の機能を追加したときに、条件によっては注意事項を追加する可能性あり、枠がさらに必要になる可能性があります）
         </h4>
         <br>
-        <button class="button" id="agreebutton">閉じる</button>
+        <button class="normalbutton" id="agreebutton">閉じる</button>
       </div>
+    </div>
+    <div id="exportGraphDiv" style="position: relative;">
+      <canvas id="exportGraphviewCanvas"></canvas>
     </div>
   </body>
 </html>
