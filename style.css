@@ -7,7 +7,7 @@ body {
 
 #site-header {
   background: #F7F7F7;
-  height: 10vh;
+  height: 70px;
 }
 
 #site-header::before {
@@ -26,6 +26,7 @@ body {
 
 #A-PLAT_logo {
   height: 40px;
+  padding-left: 5px;
   margin-top: 10px;
   margin-right:50px;
 }
@@ -33,14 +34,15 @@ body {
 #NIES_logo {
   height: 40px;
   margin-top: 10px;
+  padding-left: 5px;
 }
 
 #site-footer::before {
-    position: absolute;
-    content: "";
-    width: 100%;
-    height: 5px;
-    background: #f1752a;
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 5px;
+  background: #f1752a;
   background: -moz-linear-gradient(left, #64CFFF 0%, #e51cd6 44%, #f1752a 100%);
   background: -webkit-gradient(linear, left center, right center, from(#64CFFF), color-stop(44%, #e51cd6), to(#f1752a));
   background: -webkit-linear-gradient(left, #64CFFF 0%, #e51cd6 44%, #f1752a 100%);
@@ -77,6 +79,7 @@ body {
 
 #site-footer_info p {
   font-size: 9px;
+  padding-left: 20px;
 }
 
 #footer_menu{
@@ -105,7 +108,7 @@ body {
 }
 
 #sideDiv {
-  padding: 0px;
+  margin: 0px;
   width: 0vw;
   height: 100%;
   overflow-x: hidden;
@@ -113,11 +116,11 @@ body {
 }
 
 #headerDiv {
-  width: 80%;
+  width: 95%;
   min-width: 250px;
-  padding: 15px;
-  padding-top: 0px;
-  height: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 50px;
   display: flex;
   flex-direction: column;
   background: #F7F7F7;
@@ -125,7 +128,7 @@ body {
 
 #displayDiv {
   width: 60vw;
-  height: calc(100% - 50px);
+  height: 100%;
   display: block;
   flex-direction: row;
   /*overflow: hidden;*/
@@ -194,8 +197,7 @@ h3 {
 }
 
 .download {
-  display: flex;
-  flex-direction: column;
+  display: block;
   margin-top: 5px;
 }
 .hidden {
@@ -203,7 +205,7 @@ h3 {
 }
 
 #yearselector{
-  width: 90%;
+  width: 100%;
   height: 50px;
 }
 
@@ -223,12 +225,21 @@ h3 {
   max-width: 30% !important;
 }
 
+.rowAlignment {
+  display: flex;
+  align-items: center;
+}
+
 .helpbutton {
-  height: 40px;
-  width: 160px;
+  min-width: 190px;
+  height: 45px;
   cursor: pointer;
   background-color: rgb(255, 242, 204);
-  border: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1;
+  margin: 5px;
   border-radius: 5px;
 }
 
@@ -236,17 +247,37 @@ h3 {
   background-color: rgb(255, 255, 153);
 }
 
-.button {
-  height: 40px;
-  width: 140px;
+.normalbutton {
+  min-width: 120px;
+  height: 45px;
   cursor: pointer;
   background-color: rgb(226, 240, 217);
-  border: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1;
+  margin: 5px;
   border-radius: 5px;
 }
 
-.button:hover {
+.normalbutton:hover {
   background-color: #bbbbbb;
+}
+
+.infobutton {
+  display: none;
+  min-width: 100px;
+  height: 30px;
+  font-size: 9;
+  cursor: pointer;
+  background-color: #bbbbbb;
+  position: absolute;
+  right: 0;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  margin: 8px;
+  border-radius: 5px;
 }
 
 .esri-legend__layer-caption {
@@ -258,7 +289,7 @@ calcite-icon {
   padding-right: 5px;
 }
 
-#helpDialog {
+#attentionDialog {
   display: flex;
   position: absolute;
   top: 0px;
@@ -269,7 +300,7 @@ calcite-icon {
   background-color: rgba(70, 70, 70, 0.9);
 }
 
-#helpDialog-contents {
+#attentionDialog-contents {
   display: block;
   position: static;
   word-break: break-all;
@@ -286,15 +317,72 @@ calcite-icon {
   background-color: rgb(255, 242, 204);
 }
 
+#smartFooterDialog {
+  display: flex;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0%;
+  right: 0%;
+  z-index: 4;
+  background-color: rgba(70, 70, 70, 0.9);
+}
 
+#smartFooterDialog-contents {
+  display: flex;
+  flex-direction: column;
+  position: static;
+  word-break: break-all;
+  font-size: 14px;
+  padding: 20px 20px 20px 20px;
+  height: 50%; 
+  width: 80%;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-right: auto;
+  color: black;
+  overflow-y: auto;
+  background-color: #bbbbbb;
+}
+
+.infoPanel {
+  margin: 5px;
+  margin-top: 40px;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  padding: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
 
 
 @media screen and (max-width:600px) {
+  #mainDiv {
+    height: calc(100vh - 120px);
+  }
   #sideDiv {
-    width: 90vw;
+    left: 60px;
+    width: calc(100vw - 60px);
+    height: calc(100vh - 120px);
+    position: absolute;
+    z-index: 2;
   }
   #displayDiv {
-    width: 0vw;
+    left: 60px;
+    width: calc(100vw - 60px);
+    height: calc(100vh - 120px);
+    z-index: 1;
+    position: absolute;
+  }
+  .rowAlignment {
+    display: block;
+    align-items: center;
+  }
+  #NIES_logo {
+    height: 30px;
+    margin-top: 10px;
+    padding-left: 5px;
   }
   .esri-widget {
     font-size: 9px !important;
@@ -302,11 +390,14 @@ calcite-icon {
   .esri-ui-corner .esri-expand .esri-widget--panel, .esri-ui-corner .esri-expand .esri-widget--panel-height-only, .esri-ui-corner .esri-component>.esri-widget--panel, .esri-ui-corner .esri-component.esri-widget--panel {
     width: 160px !important;
   }
-  #site-footer {
+  #site-footer_info {
     display: none;
   }
   
-  #helpDialog-contents {
-    height: 100%; 
+  #attentionDialog-contents {
+    height: 90%; 
+  }
+  .infobutton {
+    display: block;
   }
 }
