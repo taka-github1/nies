@@ -145,7 +145,7 @@
               画像のダウンロードでは、右側に表示されているマップやグラフを画像としてダウンロードできます。
             </calcite-tooltip> 
           </calcite-tooltip-manager>
-          <div class="columnAlignment">
+          <div class="rowAlignment">
             <button class="normalbutton" id="csv_observatory">
               <calcite-icon icon="file-csv" scale="s"></calcite-icon>数値データ
             </button>
@@ -155,6 +155,7 @@
             <button class="normalbutton" id="graph_observatory" style="display: none">
               <calcite-icon icon="graph-time-series" scale="s"></calcite-icon>グラフ画像
             </button>
+            <!--
             <calcite-label layout="inline" scale="s">
               画像サイズ 
               <calcite-select id="exportsizeselector" scale="s" width="half">
@@ -163,6 +164,7 @@
                 <calcite-option>WXGA 1280×800</calcite-option>
               </calcite-select>
             </calcite-label>
+            -->
           </div>
           <div class="infoPanel">
             <p>
@@ -176,7 +178,6 @@
       <div id="displayDiv">
         <div id="mapviewDiv">
           <div id="mapviewCanvas"></div>
-          <div id="exportMapviewCanvas"></div>
         </div>
         <div id="graphviewDiv">
           <div id="graphviewDisableDiv">
@@ -186,7 +187,6 @@
         </div>
       </div>
     </div>
-    <canvas id="export_canvas" width="200px" height="200px" style="display: none"></canvas>
     <footer id="site-footer">
       <a href="https://www.nies.go.jp/"><img src="img/nies_logo.png" alt="NIES-logo" id="NIES_logo"></a>
       <div id="site-footer_info">
@@ -201,10 +201,13 @@
           © National Institute for Environmental Studies. All Rights Reserved.            
         </p>
       </div>
+      <button class="infobutton" id="smartFooterButton">
+        <calcite-icon icon="question" scale="s"></calcite-icon>サイト情報
+      </button>
     </footer>
     
     <div id="attentionDialog" style="display:none">
-      <div id='attentionDialog-contents'>
+      <div id="attentionDialog-contents">
         <h2>
           注意事項：長期変化傾向の評価について
         </h2>
@@ -230,8 +233,19 @@
         <button class="normalbutton" id="agreebutton">閉じる</button>
       </div>
     </div>
-    <div id="exportGraphDiv" style="position: relative;">
-      <canvas id="exportGraphviewCanvas"></canvas>
+    <div id="smartFooterDialog" style="display:none">
+      <div id="smartFooterDialog-contents">
+        <h4>
+          このサイトは、国立研究開発法人国立環境研究所が運営しています。<br/>
+        <br/>
+          © National Institute for Environmental Studies. All Rights Reserved.            
+        </h4>
+        <a href="https://adaptation-platform.nies.go.jp/about/contact.html">お問い合わせ</a>
+        <a href="https://adaptation-platform.nies.go.jp/about/policy.html">サイトポリシー</a>
+        <a href="https://www.nies.go.jp/kojinjoho/privacypolicy.html">プライバシーポリシー</a><br/>
+        <br>
+        <button class="normalbutton" id="closebutton">閉じる</button>
+      </div>
     </div>
   </body>
 </html>
