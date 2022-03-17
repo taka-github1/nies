@@ -1,10 +1,6 @@
 var breakpoint_width = 600;
 var map = null;
 var view = null;
-var legend = null;
-var current_field = null;
-var left_layer = null;
-var graphicsLayer = null;
 var chart = null;
 
 //configの読み込み
@@ -29,7 +25,6 @@ require([
   "esri/views/MapView",
   "esri/layers/TileLayer",
   "esri/layers/FeatureLayer",
-  "esri/layers/GraphicsLayer",
   "esri/widgets/Home",
   "esri/widgets/Swipe",
   "esri/widgets/Legend",
@@ -39,7 +34,7 @@ require([
   "esri/geometry/Extent",
   "esri/renderers/Renderer",
   "esri/widgets/BasemapGallery/support/LocalBasemapsSource"
-], function (Portal, OAuthInfo, identityManager, Map, WebMap, Basemap, MapView, TileLayer, FeatureLayer, GraphicsLayer, 
+], function (Portal, OAuthInfo, identityManager, Map, WebMap, Basemap, MapView, TileLayer, FeatureLayer, 
               Home, Swipe, Legend, Expand, BasemapGallery, Slider, Extent, Renderer, LocalBasemapsSource) {
   
   var portalUrl =  "https://nies.maps.arcgis.com";
@@ -66,7 +61,7 @@ require([
     zoom: 14,
     constraints: {
       minScale : 50000000,
-      maxScale : 5000
+      maxScale : 250000
     }
   });
 
@@ -87,22 +82,6 @@ require([
     container: document.createElement("div")
   });
 
-  var bgExpand = new Expand({
-    view: view,
-    content: basemapGallery
-  });
-
-  basemapGallery.watch("activeBasemap", function () {
-    var mobileSize =
-        view.heightBreakpoint === "xsmall" ||
-        view.widthBreakpoint === "xsmall";
-
-    if (mobileSize) {
-      bgExpand.collapse();
-    }
-  });
-  view.ui.add(bgExpand, "top-right");
-
   var legend = new Legend({
     view: view
   });
@@ -115,6 +94,24 @@ require([
   });
 
   view.ui.add(lgExpand, "bottom-right");
+
+  var bgExpand = new Expand({
+    view: view,
+    content: basemapGallery,
+    expanded: false,
+    mode : "floating"
+  });
+
+  basemapGallery.watch("activeBasemap", function () {
+    var mobileSize =
+        view.heightBreakpoint === "xsmall" ||
+        view.widthBreakpoint === "xsmall";
+
+    if (mobileSize) {
+      bgExpand.collapse();
+    }
+  });
+  view.ui.add(bgExpand, "top-right");
 
   var yearSlider = new Slider({
     container: "yearselector",
@@ -140,12 +137,20 @@ require([
   
 
   //イベント処理
-  $('#helpbutton').click(function () {
-    $('#helpDialog').fadeIn();
+  $('#attentionButton').click(function () { 
+    $('#attentionDialog').fadeIn();
   });
   
   $('#agreebutton').click(function () {
-    $(this).parents('#helpDialog').fadeOut();
+    $(this).parents('#attentionDialog').fadeOut();
+  });
+  
+  $('#smartFooterButton').click(function () { 
+    $('#smartFooterDialog').fadeIn();
+  });
+  
+  $('#closebutton').click(function () {
+    $(this).parents('#smartFooterDialog').fadeOut();
   });
   
   $('#displayselector').on("calciteRadioGroupChange", function(event) { 
@@ -218,13 +223,17 @@ require([
     startGraphDownload();
   });
   
+  $('#exportsizeselector').on("calciteSelectChange", function(event) {
+    draw_charts();
+  });
+  
   //サイドパネルの展開・折りたたみ処理
   $("#sideExpand").on("click", function(event) {
-    var dispShowVW = "90vw";
-    var dispHideVW = "50vw";
+    var dispShowVW = "calc(100vw - 60px)";
+    var dispHideVW = "60vw";
     if (window.innerWidth < breakpoint_width) {
-      dispShowVW = "90vw";
-      dispHideVW = "0vw";
+      dispShowVW = "calc(100vw - 60px)";
+      dispHideVW = "calc(100vw - 60px)";
     }
     
     if (event.target.icon == "chevrons-left") { //展開
@@ -534,7 +543,7 @@ require([
     }
   }
 
-  function draw_charts(observatory) {
+  async function draw_charts() {
     
     if (shihyoLayer == null) {
       return;
@@ -544,10 +553,7 @@ require([
     var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
     var prefecture = $('#prefectureselector').val();
-
-    if (observatory == undefined) {
-      observatory =  $('#observatoryselector').val();
-    }
+    var observatory =  $('#observatoryselector').val();
     
     if (observatory == "全て") {
       $("#graphviewDisableDiv").show();
@@ -571,45 +577,64 @@ require([
     ];
     query.orderByFields = "年";
     query.groupByFieldsForStatistics = "年";
-    
+
     var chat_title = observatory + "観測所";
     chat_title = chat_title + "　" + shihyotxt;
-    
+
     var expression = "官署 = '" + kansho + "' AND " + field + " <> " + String(32767);
     if (bunrui == "月別値") { 
       chat_title = chat_title + "　" + monthtxt;
       expression = expression + " AND 月 = " + month;
     }
-    
+
     query.where = expression + " AND 観測地点名 = '" + observatory + "'";
     query.returnGeometry = false;
 
-    shihyoLayer.queryFeatures(query)
-      .then(function(response){ 
-      var features = response.features;
-      var labels = [];
-      var datas = [];
-      for(var i = 0; i< features.length; i++) {
-        var year = features[i].attributes["年"];
-        var value = features[i].attributes[field];
+    var response = await shihyoLayer.queryFeatures(query);
+    var features = response.features;
+    var labels = [];
+    var datas = [];
 
-        labels.push(year);
-        datas.push(Math.round(value * 100) / 100);
+    var before_year = "";
+    for(var i = 0; i< features.length; i++) {
+      var year = features[i].attributes["年"];
+      var value = features[i].attributes[field];
+
+      //年の開始は5の倍数
+      if (i == 0) {
+        var fill_year = Math.floor(year / 5) * 5;;
+        while (fill_year != year) {
+          labels.push(fill_year);
+          datas.push(null);
+          fill_year++;
+        }
+        before_year = year - 1;
       }
 
-      update_chart(chat_title, labels, datas);
-      
-      if (observatory != "全て"){
-        $('#chartDiv').removeClass('hidden');
-      } else {
-        $('#chartDiv').addClass('hidden');
+      //データ欠落年はnullをセット
+      while ((before_year + 1) != year) {
+        labels.push(before_year);
+        datas.push(null);
+        before_year++;
       }
-    });
+
+      labels.push(year);
+      datas.push(Math.round(value * 100) / 100);
+      before_year = year;
+    }
+
+    update_chart("graphviewCanvas", chat_title, labels, datas);
+
+    if (observatory != "全て"){
+      $('#chartDiv').removeClass('hidden');
+    } else {
+      $('#chartDiv').addClass('hidden');
+    }
   }
 
-  function update_chart(chat_title, labels, datas){
+  function update_chart(element, chat_title, labels, datas){
 
-    var ctx = document.getElementById("graphviewCanvas").getContext('2d');
+    var ctx = document.getElementById(element).getContext('2d');
     
     if (chart != null) {
       chart.destroy();
@@ -644,18 +669,22 @@ require([
       pointStyle: 'circle',
       borderWidth: 1,
       radius: 3,
+      spanGaps: true,
       fill: false
     });
 
     var yLabel = shihyotxt;
 
+    const notnull_datas = datas.filter((item) => {
+      return item !== null && !isNaN(Number(item));
+    });
     var xAxesMin = Math.floor(Math.min.apply(null, labels) / 10 * 10);
     var xAxesMax = Math.ceil(Math.max.apply(null, labels) / 10 * 10); 
-    var yAxesMin = Math.floor(Math.min.apply(null, datas) / yAxesStep) * yAxesStep;
+    var yAxesMin = Math.floor(Math.min.apply(null, notnull_datas) / yAxesStep) * yAxesStep;
     if (chart_type == "bar") {
       yAxesMin = 0;
     }
-    var yAxesMax = Math.ceil(Math.max.apply(null, datas) / yAxesStep) * yAxesStep;
+    var yAxesMax = Math.ceil(Math.max.apply(null, notnull_datas) / yAxesStep) * yAxesStep;
     
     chart = new Chart(ctx, {
       type: chart_type,
@@ -695,12 +724,12 @@ require([
               fontSize: scales_fontSize,
               fontColor: '#000000'
             },
+            gridLines: {
+              display: false
+            },
             ticks: {
               autoSkip: false,
-              min: xAxesMin,
-              max: xAxesMax,
               fontColor: '#000000',
-              //stepSize: 5,
               callback: function(value, index, values){
                 if (value%5==0){
                   return  value + "年";  
@@ -807,6 +836,7 @@ require([
     });
 
 
+    //CSVデータの保存
     function startCsvDownload(shihyo, fields, records) {
       const filename = kansho + "_" + shihyo + '.csv';
 
@@ -835,6 +865,7 @@ require([
     }
   }
 
+  //マップ画像の保存
   async function startMapDownload() {
     var prefecture = $('#prefectureselector').val();
     var observatory =  $('#observatoryselector').val();
@@ -844,7 +875,6 @@ require([
     var shihyo = $('#shihyoselector').val();
     var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
-    
     var titleHeight = 60;
     
     var mapScreenshot = await view.takeScreenshot();
@@ -873,12 +903,13 @@ require([
     ctx.drawImage(mapImg, 0, 0, mapImg.width, mapImg.height, 0,  titleHeight, mapImg.width, mapImg.height);
     ctx.drawImage(legendImg, 0, 0, legendImg.width, legendImg.height, legendDx, legendDy, legendDw, legendDh);
 
-    var export_text = shihyotxt + " ";
+    var export_text = shihyotxt + "_";
     if (bunrui == "年間値") {
-      export_text += year + "年観測";
+      export_text += year + "年";
     } else {
-      export_text += year + "年" + month + "月観測";
+      export_text += year + "年" + month + "月";
     }
+    export_text += "_分布";
     
     ctx.fillStyle = "black";
     ctx.font = "24px serif";
@@ -893,11 +924,12 @@ require([
 
     var a = document.createElement('a');
     a.href = export_canvas.toDataURL();
-    a.download = shihyotxt + '.png';
+    a.download = export_text + '.png';
     a.click();
   }
 
-  function startGraphDownload() {
+  //グラフ画像の保存
+  async function startGraphDownload() {
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
     var observatory =  $('#observatoryselector').val();
     
@@ -905,11 +937,15 @@ require([
       alert("観測所が選択されていません");
       return;
     }
-
+    
+    var export_text = observatory + "観測所_";
+    export_text += shihyotxt;
+    export_text += "_グラフ";
+    
     var ctx = document.getElementById("graphviewCanvas");
     var a = document.createElement('a');
     a.href = ctx.toDataURL();
-    a.download = shihyotxt + '.png';
+    a.download = export_text + '.png';
     a.click();
   }
 });
