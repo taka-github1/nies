@@ -116,12 +116,11 @@ body {
 }
 
 #headerDiv {
-  width: 80%;
+  width: 95%;
   min-width: 250px;
-  padding: 15px;
-  padding-top: 0px;
-  padding-bottom: 150px;
-  height: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 50px;
   display: flex;
   flex-direction: column;
   background: #F7F7F7;
@@ -146,12 +145,6 @@ body {
   height: 100%;
 }
 
-#exportMapviewCanvas {
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-}
-
 #graphviewDiv {
   display: none;
   height: 100%;
@@ -170,10 +163,6 @@ body {
   font-size: 24px;
   text-align: center;
   margin-top: 20vh;
-}
-
-#exportGraphDiv {
-  opacity: 0;
 }
 
 h2 {
@@ -238,13 +227,6 @@ h3 {
 
 .rowAlignment {
   display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.columnAlignment {
-  display: block;
-  justify-content: center;
   align-items: center;
 }
 
@@ -280,6 +262,22 @@ h3 {
 
 .normalbutton:hover {
   background-color: #bbbbbb;
+}
+
+.infobutton {
+  display: none;
+  min-width: 100px;
+  height: 30px;
+  font-size: 9;
+  cursor: pointer;
+  background-color: #bbbbbb;
+  position: absolute;
+  right: 0;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  margin: 8px;
+  border-radius: 5px;
 }
 
 .esri-legend__layer-caption {
@@ -319,10 +317,38 @@ calcite-icon {
   background-color: rgb(255, 242, 204);
 }
 
+#smartFooterDialog {
+  display: flex;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0%;
+  right: 0%;
+  z-index: 4;
+  background-color: rgba(70, 70, 70, 0.9);
+}
+
+#smartFooterDialog-contents {
+  display: flex;
+  flex-direction: column;
+  position: static;
+  word-break: break-all;
+  font-size: 14px;
+  padding: 20px 20px 20px 20px;
+  height: 50%; 
+  width: 80%;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-right: auto;
+  color: black;
+  overflow-y: auto;
+  background-color: #bbbbbb;
+}
+
 .infoPanel {
   margin: 5px;
   margin-top: 40px;
-  width: 100%;
   border: 2px solid #000000;
   border-radius: 10px;
   padding: 10px;
@@ -332,11 +358,31 @@ calcite-icon {
 
 
 @media screen and (max-width:600px) {
+  #mainDiv {
+    height: calc(100vh - 120px);
+  }
   #sideDiv {
-    width: 90vw;
+    left: 60px;
+    width: calc(100vw - 60px);
+    height: calc(100vh - 120px);
+    position: absolute;
+    z-index: 2;
   }
   #displayDiv {
-    width: 1px;
+    left: 60px;
+    width: calc(100vw - 60px);
+    height: calc(100vh - 120px);
+    z-index: 1;
+    position: absolute;
+  }
+  .rowAlignment {
+    display: block;
+    align-items: center;
+  }
+  #NIES_logo {
+    height: 30px;
+    margin-top: 10px;
+    padding-left: 5px;
   }
   .esri-widget {
     font-size: 9px !important;
@@ -344,11 +390,14 @@ calcite-icon {
   .esri-ui-corner .esri-expand .esri-widget--panel, .esri-ui-corner .esri-expand .esri-widget--panel-height-only, .esri-ui-corner .esri-component>.esri-widget--panel, .esri-ui-corner .esri-component.esri-widget--panel {
     width: 160px !important;
   }
-  #site-footer {
+  #site-footer_info {
     display: none;
   }
   
-  #helpDialog-contents {
-    height: 100%; 
+  #attentionDialog-contents {
+    height: 90%; 
+  }
+  .infobutton {
+    display: block;
   }
 }
