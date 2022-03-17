@@ -1,13 +1,7 @@
 var breakpoint_width = 600;
 var map = null;
 var view = null;
-var exportView = null;
-var legend = null;
-var current_field = null;
-var left_layer = null;
-var graphicsLayer = null;
 var chart = null;
-var exportChart = null;
 
 //configの読み込み
 var json_url = "aplat_setting.json";
@@ -31,7 +25,6 @@ require([
   "esri/views/MapView",
   "esri/layers/TileLayer",
   "esri/layers/FeatureLayer",
-  "esri/layers/GraphicsLayer",
   "esri/widgets/Home",
   "esri/widgets/Swipe",
   "esri/widgets/Legend",
@@ -41,10 +34,9 @@ require([
   "esri/geometry/Extent",
   "esri/renderers/Renderer",
   "esri/widgets/BasemapGallery/support/LocalBasemapsSource"
-], function (Portal, OAuthInfo, identityManager, Map, WebMap, Basemap, MapView, TileLayer, FeatureLayer, GraphicsLayer, 
+], function (Portal, OAuthInfo, identityManager, Map, WebMap, Basemap, MapView, TileLayer, FeatureLayer, 
               Home, Swipe, Legend, Expand, BasemapGallery, Slider, Extent, Renderer, LocalBasemapsSource) {
-  
-  /*  開発中は認証なし
+  /*
   var portalUrl =  "https://nies.maps.arcgis.com";
 
   var info = new OAuthInfo({
@@ -55,7 +47,6 @@ require([
   identityManager.registerOAuthInfos([info]);
   identityManager.getCredential(portalUrl);
   */
-  
   initForm();
   
   map = new WebMap({
@@ -72,10 +63,6 @@ require([
       minScale : 50000000,
       maxScale : 250000
     }
-  });
-  exportView = new MapView({
-    container: "exportMapviewCanvas",
-    map: map
   });
 
   var shihyoLayer = null;
@@ -95,22 +82,6 @@ require([
     container: document.createElement("div")
   });
 
-  var bgExpand = new Expand({
-    view: view,
-    content: basemapGallery
-  });
-
-  basemapGallery.watch("activeBasemap", function () {
-    var mobileSize =
-        view.heightBreakpoint === "xsmall" ||
-        view.widthBreakpoint === "xsmall";
-
-    if (mobileSize) {
-      bgExpand.collapse();
-    }
-  });
-  view.ui.add(bgExpand, "top-right");
-
   var legend = new Legend({
     view: view
   });
@@ -123,6 +94,24 @@ require([
   });
 
   view.ui.add(lgExpand, "bottom-right");
+
+  var bgExpand = new Expand({
+    view: view,
+    content: basemapGallery,
+    expanded: false,
+    mode : "floating"
+  });
+
+  basemapGallery.watch("activeBasemap", function () {
+    var mobileSize =
+        view.heightBreakpoint === "xsmall" ||
+        view.widthBreakpoint === "xsmall";
+
+    if (mobileSize) {
+      bgExpand.collapse();
+    }
+  });
+  view.ui.add(bgExpand, "top-right");
 
   var yearSlider = new Slider({
     container: "yearselector",
@@ -154,6 +143,14 @@ require([
   
   $('#agreebutton').click(function () {
     $(this).parents('#attentionDialog').fadeOut();
+  });
+  
+  $('#smartFooterButton').click(function () { 
+    $('#smartFooterDialog').fadeIn();
+  });
+  
+  $('#closebutton').click(function () {
+    $(this).parents('#smartFooterDialog').fadeOut();
   });
   
   $('#displayselector').on("calciteRadioGroupChange", function(event) { 
@@ -232,22 +229,20 @@ require([
   
   //サイドパネルの展開・折りたたみ処理
   $("#sideExpand").on("click", function(event) {
-    var dispShowVW = "90vw";
-    var dispHideVW = "50vw";
+    var dispShowVW = "calc(100vw - 60px)";
+    var dispHideVW = "60vw";
     if (window.innerWidth < breakpoint_width) {
-      dispShowVW = "90vw";
-      dispHideVW = "1px";
+      dispShowVW = "calc(100vw - 60px)";
+      dispHideVW = "calc(100vw - 60px)";
     }
     
     if (event.target.icon == "chevrons-left") { //展開
       $("#sideExpand").attr("icon", "chevrons-right");
-      $("#sideDiv").css('width', "0vw");
-      $("#sideDiv").css('opacity','0'); 
+      $("#sideDiv").css('display','none'); 
       $("#displayDiv").css('width', dispShowVW);
     } else {  //折りたたみ
       $("#sideExpand").attr("icon", "chevrons-left");
-      $("#sideDiv").css('width', "40vw");
-      $("#sideDiv").css('opacity','1'); 
+      $("#sideDiv").css('display','block'); 
       $("#displayDiv").css('width', dispHideVW);
     } 
     draw_charts();
@@ -559,23 +554,6 @@ require([
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
     var prefecture = $('#prefectureselector').val();
     var observatory =  $('#observatoryselector').val();
-    var size = $('#exportsizeselector').val();
-    var graphWidth = 800;
-    var graphHeight = 600;
-    if (size == "SVGA 800×600") {
-      graphWidth = 800;
-      graphHeight = 600;
-    } else if (size == "XGA	1024×768") {
-      graphWidth = 1024;
-      graphHeight = 768;
-    } else if (size == "WXGA 1280×800") {
-      graphWidth = 1280;
-      graphHeight = 800;
-    }
-    $("#exportGraphDiv").css("width", graphWidth);
-    $("#exportGraphDiv").css("height", graphHeight);
-    $("#exportGraphviewCanvas").attr('width', graphWidth);
-    $("#exportGraphviewCanvas").attr('height', graphHeight);
     
     if (observatory == "全て") {
       $("#graphviewDisableDiv").show();
@@ -646,7 +624,6 @@ require([
     }
 
     update_chart("graphviewCanvas", chat_title, labels, datas);
-    update_chart("exportGraphviewCanvas", chat_title, labels, datas);
 
     if (observatory != "全て"){
       $('#chartDiv').removeClass('hidden');
@@ -659,13 +636,8 @@ require([
 
     var ctx = document.getElementById(element).getContext('2d');
     
-    var chartElem = chart;
-    if (element == "exportGraphviewCanvas") {
-      chartElem = exportChart;
-    }
-    
-    if (chartElem != null) {
-      chartElem.destroy();
+    if (chart != null) {
+      chart.destroy();
     }
 
     var shihyo = $('#shihyoselector').val();
@@ -714,7 +686,7 @@ require([
     }
     var yAxesMax = Math.ceil(Math.max.apply(null, notnull_datas) / yAxesStep) * yAxesStep;
     
-    chartElem = new Chart(ctx, {
+    chart = new Chart(ctx, {
       type: chart_type,
       data: {
         labels: labels,
@@ -903,41 +875,9 @@ require([
     var shihyo = $('#shihyoselector').val();
     var bunrui = config.shihyo.find(v => v.title === shihyo).bunrui;
     var shihyotxt = $('#shihyoselector calcite-option:selected').text();
-    var size = $('#exportsizeselector').val();
     var titleHeight = 60;
-    var mapWidth = 800;
-    var mapHeight = 540;
-    if (size == "SVGA 800×600") {
-      mapWidth = 800;
-      mapHeight = 540;
-    } else if (size == "XGA	1024×768") {
-      mapWidth = 1024;
-      mapHeight = 708;
-    } else if (size == "WXGA 1280×800") {
-      mapWidth = 1280;
-      mapHeight = 740;
-    }
-    $("#exportMapviewCanvas").css("width", mapWidth);
-    $("#exportMapviewCanvas").css("height", mapHeight);
     
-    //描画完了まで待機
-    const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    while (!view.stationary) {
-      await _sleep(1000);
-    }
-
-    exportView.center = view.center;
-    exportView.zoom = view.zoom;
-
-    //描画完了まで待機
-    while (!exportView.stationary) {
-      await _sleep(1000);
-    }
-    while (exportView.updating) {
-      await _sleep(1000);
-    }
-    
-    var mapScreenshot = await exportView.takeScreenshot();
+    var mapScreenshot = await view.takeScreenshot();
     var mapImg = new Image();
     mapImg.src = mapScreenshot.dataUrl;
     await mapImg.onload;
@@ -973,6 +913,11 @@ require([
     
     ctx.fillStyle = "black";
     ctx.font = "24px serif";
+    
+    if (window.innerWidth < breakpoint_width) {
+    ctx.font = "12px serif";
+    }
+    
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.fillText(export_text, 10, 10);
@@ -997,23 +942,7 @@ require([
     export_text += shihyotxt;
     export_text += "_グラフ";
     
-    var size = $('#exportsizeselector').val();
-    var graphWidth = 800;
-    var graphHeight = 600;
-    if (size == "SVGA 800×600") {
-      graphWidth = 800;
-      graphHeight = 600;
-    } else if (size == "XGA	1024×768") {
-      graphWidth = 1024;
-      graphHeight = 768;
-    } else if (size == "WXGA 1280×800") {
-      graphWidth = 1280;
-      graphHeight = 800;
-    }
-    $("#exportGraphviewCanvas").attr('width', graphWidth);
-    $("#exportGraphviewCanvas").attr('height', graphHeight);
-    
-    var ctx = document.getElementById("exportGraphviewCanvas");
+    var ctx = document.getElementById("graphviewCanvas");
     var a = document.createElement('a');
     a.href = ctx.toDataURL();
     a.download = export_text + '.png';
